@@ -1,0 +1,36 @@
+<resources>
+    <string name="app_name">JukeBox World</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="menu_home">Home</string>
+    <string name="menu_gallery">Gallery</string>
+    <string name="menu_slideshow">Slideshow</string>
+    <string name="title_activity_main2">MainActivity</string>
+    <string name="title_home">Home</string>
+    <string name="title_store">Store</string>
+    <string name="title_mymusic">My Music</string>
+    <string name="title_promotions">Promotions</string>
+
+
+    <string name="list_artists">ARTISTS</string>
+    <string name="list_albums">ALBUMS</string>
+    <string name="list_podcasts">PODCASTS</string>
+    <string name="button_search">Search</string>
+    <string name="button_store">Store</string>
+    <string name="function_title">FUNCTION</string>
+    <string name="function_detail">To allow user to view the details of the artist, album and podcasts and the audios with them.</string>
+    <string name="function_store">To allow user to listen to a short snippet of song and/or purchase songs.</string>
+    <string name="function_search">To allow user to look for artists, albums and podcasts on the app.</string>
+    <string name="function_now_playing">To allow user to play/stream audio file.</string>
+    <string name="technical_title">TECHNICAL CHALLENGES</string>
+    <string name="technical_detail">Make requests to get the list of songs associated with the artist, album and podcast.</string>
+    <string name="technical_store">Require a networking library to connect to the server to retrieve a list of available songs and apis to stream snippets of songs and/or purchase songs.</string>
+    <string name="technical_search">Require data storage to store all the information where the system can run queries to filter results from the storage.</string>
+    <string name="technical_now_playing">Require an audio player and for streaming, a network library to stream audio file.</string>
+
+</resources>
