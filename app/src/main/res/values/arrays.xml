@@ -17,4 +17,5 @@
         <item>Gospel</item>
         <item>House</item>
     </string-array>
+    <string-array name="com_google_android_gms_fonts_certs" />
 </resources>

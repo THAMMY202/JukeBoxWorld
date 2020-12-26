@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="10dp"
+    card_view:cardElevation="5dp"
+    card_view:cardCornerRadius="5dp"
+    card_view:contentPaddingLeft="16dp"
+    card_view:contentPaddingTop="16dp"
+    card_view:contentPaddingBottom="16dp"
+    card_view:contentPaddingRight="16dp"
+    card_view:cardPreventCornerOverlap="true"
+    card_view:theme="@style/AlertDialog.AppCompat">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/TrackLinearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginBottom="10dp"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/imgTrackAlbum"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="#880E4F" />
+
+            <TextView
+                android:id="@+id/tvTrackTitle"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="5"
+                android:paddingTop="16dp"
+                android:paddingLeft="16dp"
+                android:text="Blah Blah Blah"/>
+
+            <ImageView
+                android:id="@+id/imgPlayTrack"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:padding="10dp"
+                android:src="@drawable/play" />
+
+        </LinearLayout>
+
+        <SeekBar
+            android:layout_below="@+id/TrackLinearLayout"
+            android:id="@+id/song_seekbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </RelativeLayout>
+
+</androidx.cardview.widget.CardView>

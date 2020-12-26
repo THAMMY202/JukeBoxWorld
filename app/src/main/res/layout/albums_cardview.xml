@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+
+        <ImageView
+            android:id="@+id/imgAlbumCoverCd"
+            android:layout_width="@dimen/list_item_width"
+            android:layout_height="@dimen/list_item_height"
+            android:layout_marginRight="@dimen/list_item_right_margin"
+            android:scaleType="centerCrop"
+            android:src="@drawable/adele" />
+
+        <TextView
+            android:visibility="gone"
+            android:id="@+id/tvAlbumTitleCd"
+            android:layout_below="@+id/imgAlbumCoverCd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="3dp"
+            android:layout_marginBottom="10dp"
+            android:fontFamily="sans-serif-light"
+            android:text="Strings and Blings"
+            android:textSize="15sp"
+            android:textStyle="italic" />
+
+</LinearLayout>

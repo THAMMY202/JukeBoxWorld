@@ -1,12 +1,22 @@
 package com.jukebox.world;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.GestureDetector;
 import android.view.MenuItem;
 import android.view.Menu;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.SearchView;
 import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.ViewFlipper;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.navigation.NavigationView;
@@ -16,6 +26,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.jukebox.world.ViewModel.AdsSlideViewModel;
+import com.jukebox.world.ui.SocailActivity;
+import com.squareup.picasso.Picasso;
 
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -25,6 +38,8 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
@@ -37,6 +52,10 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     private TextView mprofileName;
     private ImageView mProfileImage;
 
+    private ViewFlipper viewFlipper;
+    private DatabaseReference databaseReference;
+    private List<AdsSlideViewModel> slideLists;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         mAuth = FirebaseAuth.getInstance();
         userID = mAuth.getCurrentUser().getUid();
         mCustomerDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child("Customers").child(userID);
+
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
@@ -63,8 +83,12 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         mProfileImage = header.findViewById(R.id.profileImage);
         mprofileName = header.findViewById(R.id.profileName);
 
-        getUserInfo();
 
+        databaseReference = FirebaseDatabase.getInstance().getReference();
+        slideLists = new ArrayList<>();
+
+        getUserInfo();
+        getAllAds();
 
         /*BottomNavigationView navView = findViewById(R.id.bottom_nav_view);
         // Passing each menu ID as a set of Ids because each
@@ -75,6 +99,12 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         NavigationUI.setupWithNavController(navView, navControllerBottom);*/
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+       // getAllAds();
+    }
+
     private void getUserInfo() {
         mCustomerDatabase.addValueEventListener(new ValueEventListener() {
             @Override
@@ -83,7 +113,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                     Map<String, Object> map = (Map<String, Object>) dataSnapshot.getValue();
 
                         /*if (map.get("firstName") != null &&  map.get("lastName") != null) {
-                            mprofileName.setText(map.get("name").toString().trim() + " " + map.get("lastName").toString().trim());
+                            mprofileName.setText(map.get("name").toString().trim() + " " + map.get("lastName"));
                         }*/
 
                         if (map.get("firstName") != null) {
@@ -114,6 +144,18 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.action_ads:
+                startActivity(new Intent(MainActivity.this,AdsActivity.class));
+                return true;
+                default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
     public boolean onSupportNavigateUp() {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
@@ -129,4 +171,61 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     public boolean onQueryTextChange(String s) {
         return false;
     }
+
+    private void usingFirebaseImages(List<AdsSlideViewModel> slideLists) {
+
+        viewFlipper = (ViewFlipper)findViewById(R.id.viewFlipper_ads_show);
+
+        for (int i = 0; i < slideLists.size(); i++) {
+            String downloadImageUrl = slideLists.get(i).getImageUrl();
+            flipImages(downloadImageUrl);
+        }
+    }
+
+    private void getAllAds() {
+
+        databaseReference.child("All_Image_Uploads_Database")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.exists()) {
+                            slideLists.clear();
+                            for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                AdsSlideViewModel model = snapshot.getValue(AdsSlideViewModel.class);
+                                slideLists.add(model);
+                            }
+                            Toast.makeText(MainActivity.this, "All banners fetched", Toast.LENGTH_SHORT).show();
+                            usingFirebaseImages(slideLists);
+                        } else {
+                            Toast.makeText(MainActivity.this, "No banners in firebase", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Toast.makeText(MainActivity.this, "NO banners found \n" + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    public void flipImages(String imageUrl) {
+
+        //ViewFlipper.LayoutParams params = new ViewFlipper.LayoutParams(ViewFlipper.LayoutParams.MATCH_PARENT, ViewFlipper.LayoutParams.WRAP_CONTENT);
+        ImageView imageView = new ImageView(MainActivity.this);
+       // imageView.setLayoutParams(params);
+        Picasso.with(MainActivity.this)
+                .load(imageUrl)
+                //.fit().centerCrop()
+                .fit()
+                .into(imageView);
+
+        viewFlipper.addView(imageView);
+        viewFlipper.setFlipInterval(2500);
+        viewFlipper.setAutoStart(true);
+
+        viewFlipper.startFlipping();
+        viewFlipper.setInAnimation(this, android.R.anim.slide_in_left);
+        viewFlipper.setOutAnimation(this, android.R.anim.slide_out_right);
+    }
+
 }

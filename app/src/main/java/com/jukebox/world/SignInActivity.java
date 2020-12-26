@@ -2,6 +2,7 @@ package com.jukebox.world;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -16,15 +17,20 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class SignInActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private Button buttonSignIn,btnReset;
+    private Button buttonSignIn, btnReset;
     private TextView textViewNewAccount;
 
     private EditText inputEmail, inputPassword;
     private FirebaseAuth auth;
     private ProgressBar progressBar;
+
+    private FirebaseAuth.AuthStateListener firebaseAuthListener;
+    FirebaseUser user = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,30 +38,44 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         setContentView(R.layout.activity_sign_in);
 
         initView();
-    }
 
-    private void initView() {
-
-        auth = FirebaseAuth.getInstance();
-
-        buttonSignIn = findViewById(R.id.btnlogin);
-        buttonSignIn.setOnClickListener(this);
-
-        inputEmail = findViewById(R.id.etEmail);
-        inputPassword = findViewById(R.id.etPassword);
-
-        textViewNewAccount = findViewById(R.id.createnewac);
-        textViewNewAccount.setOnClickListener(this);
-
-        progressBar = findViewById(R.id.progressBar);
-        btnReset = (Button) findViewById(R.id.btn_reset_password);
-
-        btnReset.setOnClickListener(new View.OnClickListener() {
+       /* btnReset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(SignInActivity.this, ResetPasswordActivity.class));
             }
-        });
+        });*/
+    }
+
+    private void initView() {
+
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+        auth = FirebaseAuth.getInstance();
+
+        firebaseAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                user = FirebaseAuth.getInstance().getCurrentUser();
+                if (user != null) {
+                    Intent intent = new Intent(SignInActivity.this, MainActivity.class);
+                    startActivity(intent);
+                }
+            }
+        };
+
+        buttonSignIn = findViewById(R.id.loginBtn);
+        buttonSignIn.setOnClickListener(this);
+
+        inputEmail = findViewById(R.id.etEmail);
+        inputPassword = findViewById(R.id.password);
+
+        textViewNewAccount = findViewById(R.id.createText);
+        textViewNewAccount.setOnClickListener(this);
+
+        progressBar = findViewById(R.id.progressBar);
+        btnReset = findViewById(R.id.btn_reset_password);
+
+
     }
 
     private void loginUserAccount() {
@@ -84,8 +104,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
 
                             Intent intent = new Intent(SignInActivity.this, MainActivity.class);
                             startActivity(intent);
-                        }
-                        else {
+                        } else {
                             Toast.makeText(getApplicationContext(), "Login failed! Please try again later", Toast.LENGTH_LONG).show();
                             progressBar.setVisibility(View.GONE);
                         }
@@ -96,19 +115,39 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     public void onClick(View view) {
 
-        switch(view.getId())
-        {
-            case R.id.btnlogin:
+        switch (view.getId()) {
+            case R.id.loginBtn:
                 loginUserAccount();
                 break;
 
-            case R.id.createnewac:
+            case R.id.createText:
                 startActivity(new Intent(SignInActivity.this, SignUpActivity.class));
                 break;
 
             case R.id.btn_reset_password:
-                startActivity(new Intent(SignInActivity.this,  ResetPasswordActivity.class));
+                startActivity(new Intent(SignInActivity.this, ResetPasswordActivity.class));
                 break;
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        try {
+            auth.addAuthStateListener(firebaseAuthListener);
+
+        } catch (Exception e) {
+
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        try {
+            auth.removeAuthStateListener(firebaseAuthListener);
+        } catch (Exception e) {
+
         }
     }
 }
