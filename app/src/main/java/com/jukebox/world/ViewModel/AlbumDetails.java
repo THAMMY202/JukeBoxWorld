@@ -7,14 +7,18 @@ public class AlbumDetails {
     private String title;
     private String realiseDate;
     private String genre;
+    private String price;
+    private String artist;
 
     public AlbumDetails(){}
 
-    public AlbumDetails(String coverImageUrl, String title, String realiseDate,String genre) {
+    public AlbumDetails(String coverImageUrl, String title, String realiseDate, String genre, String price,String artist) {
         this.coverImageUrl = coverImageUrl;
         this.title = title;
         this.realiseDate = realiseDate;
         this.genre = genre;
+        this.price = price;
+        this.artist = artist;
     }
 
     @Override
@@ -31,6 +35,14 @@ public class AlbumDetails {
         return genre;
     }
 
+    public String getArtist() {
+        return artist;
+    }
+
+    public void setArtist(String artist) {
+        this.artist = artist;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -39,12 +51,14 @@ public class AlbumDetails {
         return Objects.equals(getCoverImageUrl(), that.getCoverImageUrl()) &&
                 Objects.equals(getTitle(), that.getTitle()) &&
                 Objects.equals(getRealiseDate(), that.getRealiseDate()) &&
-                Objects.equals(getGenre(), that.getGenre());
+                Objects.equals(getGenre(), that.getGenre()) &&
+                Objects.equals(getPrice(), that.getPrice())  &&
+                Objects.equals(getArtist(), that.getArtist());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getCoverImageUrl(), getTitle(), getRealiseDate(), getGenre());
+        return Objects.hash(getCoverImageUrl(), getTitle(), getRealiseDate(), getGenre(),getPrice());
     }
 
     public void setGenre(String genre) {
@@ -73,6 +87,14 @@ public class AlbumDetails {
 
     public void setRealiseDate(String realiseDate) {
         this.realiseDate = realiseDate;
+    }
+
+    public String getPrice() {
+        return price;
+    }
+
+    public void setPrice(String price) {
+        this.price = price;
     }
 
 }

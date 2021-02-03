@@ -150,6 +150,15 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             case R.id.action_ads:
                 startActivity(new Intent(MainActivity.this,AdsActivity.class));
                 return true;
+
+            case R.id.action_logout:
+                FirebaseAuth.getInstance().signOut();
+                Intent setupIntent = new Intent(MainActivity.this, SignUpActivity.class);
+                setupIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(setupIntent);
+                finish();
+                return true;
+
                 default:
                 return super.onOptionsItemSelected(item);
         }

@@ -30,11 +30,11 @@
             android:padding="16dp">
 
             <TextView
-                android:id="@+id/logout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="Version 1.1.0 beta" />
+                android:text="@string/app_version" />
+
         </LinearLayout>
 
     </com.google.android.material.navigation.NavigationView>

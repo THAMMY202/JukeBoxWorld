@@ -58,6 +58,7 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ViewHolder
                 intent.putExtra("firstName",album.getFirstName());
                 intent.putExtra("lastName",album.getLastName());
                 intent.putExtra("artistKey",album.getKey());
+                intent.putExtra("artistStageName",album.getStageName());
                 context.startActivity(intent);
             }
         });

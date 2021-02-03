@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -24,7 +25,7 @@ import com.jukebox.world.MusicCategoryRecyclerViewAdapter;
 import com.jukebox.world.R;
 import com.jukebox.world.ViewModel.AlbumDetails;
 import com.jukebox.world.ViewModel.Artist;
-import com.jukebox.world.ViewModel.Track;
+
 import com.jukebox.world.adapters.AlbumAdapter;
 import com.jukebox.world.adapters.ArtistAdapter;
 
@@ -62,12 +63,14 @@ public class HomeFragment extends Fragment implements MusicCategoryRecyclerViewA
         albumsRecyclerView.setAdapter(albumAdapter);
 
 
-        layoutManager = new GridLayoutManager(getActivity(), 2);
+        //layoutManager = new GridLayoutManager(getActivity(), 2);
         artistAdapter = new ArtistAdapter(getActivity(),artistArrayList);
         artistRecyclerView.setAdapter(artistAdapter);
 
 
         albumsRecyclerView.setHasFixedSize(true);
+        artistRecyclerView.setHasFixedSize(true);
+
         if (checkIsTablet()) {
             albumsRecyclerView.setLayoutManager(layoutManager);
             artistRecyclerView.setLayoutManager(layoutManager);
@@ -106,7 +109,9 @@ public class HomeFragment extends Fragment implements MusicCategoryRecyclerViewA
                             albumDetails.setGenre(ds.child("albumGenre").getValue().toString());
                             albumDetails.setTitle(ds.child("albumTitle").getValue().toString());
                             albumDetails.setCoverImageUrl(ds.child("albumCoverUrl").getValue().toString());
-                            albumDetails.setRealiseDate(ds.child("albumRealiseDate").getValue().toString());
+                            albumDetails.setRealiseDate(""+ds.child("albumRealiseDate").getValue());
+                            albumDetails.setPrice(ds.child("albumPrice").getValue().toString());
+                            albumDetails.setArtist(ds.child("albumArtist").getValue().toString());
                             albumDetailsArrayList.add(albumDetails);
                         }
                     }
@@ -137,12 +142,11 @@ public class HomeFragment extends Fragment implements MusicCategoryRecyclerViewA
 
                 for (DataSnapshot ds : dataSnapshot.getChildren()) {
 
-                    artist  = new Artist();
+                   /* artist  = new Artist();
                     artist.setKey(ds.getKey());
                     artist.setEmail(ds.child("email").getValue().toString());
                     artist.setFirstName(ds.child("firstName").getValue().toString());
                     artist.setLastName(ds.child("lastName").getValue().toString());
-                    artist.setEmail(ds.child("email").getValue().toString());
                     artist.setPhone(ds.child("phone").getValue().toString());
 
                     if(ds.child("stageName").getValue().toString()!=null){
@@ -154,6 +158,27 @@ public class HomeFragment extends Fragment implements MusicCategoryRecyclerViewA
 
                     if(ds.child("profileImageUrl").getValue().toString()!=null){
                         artist.setProfileImageUrl(ds.child("profileImageUrl").getValue().toString());
+                    }
+
+                    artistArrayList.add(artist);*/
+
+
+                    artist  = new Artist();
+                    artist.setKey(ds.getKey());
+                    artist.setEmail(""+ds.child("email").getValue());
+                    artist.setFirstName(""+ds.child("firstName").getValue());
+                    artist.setLastName(""+ds.child("lastName").getValue());
+                    artist.setPhone(""+ds.child("phone").getValue());
+
+                    if(""+ds.child("stageName").getValue()!=null){
+                        artist.setStageName(""+ds.child("stageName").getValue());
+                    }else {
+                        artist.setStageName("unspecified");
+                    }
+
+
+                    if(""+ds.child("profileImageUrl").getValue()!=null){
+                        artist.setProfileImageUrl(""+ds.child("profileImageUrl").getValue());
                     }
 
                     artistArrayList.add(artist);

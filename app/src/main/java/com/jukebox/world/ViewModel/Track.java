@@ -5,18 +5,26 @@ import java.util.Objects;
 public class Track {
     private String title;
     private String url;
+    private String cover;
     private String type;
     private String feature;
 
-    public Track(){
-
+    public String getCover() {
+        return cover;
     }
 
-    public Track(String title, String url, String type, String feature) {
+    public void setCover(String cover) {
+        this.cover = cover;
+    }
+
+    public Track(){ }
+
+    public Track(String title, String url, String type, String feature, String cover) {
         this.title = title;
         this.url = url;
         this.type = type;
         this.feature = feature;
+        this.cover = cover;
     }
 
     public String getTitle() {
@@ -47,12 +55,13 @@ public class Track {
         return Objects.equals(title, track.title) &&
                 Objects.equals(url, track.url) &&
                 Objects.equals(type, track.type) &&
-                Objects.equals(feature, track.feature);
+                Objects.equals(feature, track.feature)&&
+                Objects.equals(cover, track.cover);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(title, url, type, feature);
+        return Objects.hash(title, url, type, feature,cover);
     }
 
     public void setType(String type) {

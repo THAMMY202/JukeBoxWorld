@@ -50,11 +50,29 @@
 
         </LinearLayout>
 
-        <SeekBar
+        <LinearLayout
             android:layout_below="@+id/TrackLinearLayout"
-            android:id="@+id/song_seekbar"
+            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content">
+
+            <SeekBar
+                android:layout_marginRight="30dp"
+                android:id="@+id/song_seekbar"
+                android:layout_weight="10"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:layout_weight="0"
+                android:id="@+id/tvTrackTime"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:text="5:09"/>
+
+        </LinearLayout>
+
+
 
     </RelativeLayout>
 

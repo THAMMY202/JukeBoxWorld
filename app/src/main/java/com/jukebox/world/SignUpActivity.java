@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -54,12 +55,23 @@ public class SignUpActivity extends AppCompatActivity{
         editTextPassword = findViewById(R.id.password);
         buttonSignUp = findViewById(R.id.registerBtn);
 
+    TextView textViewSignInLink = findViewById(R.id.createText);
+
+        textViewSignInLink.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(SignUpActivity.this, SignInActivity.class));
+            }
+        });
+
+
         buttonSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 createUser();
             }
         });
+
     }
 
     private void createUser() {

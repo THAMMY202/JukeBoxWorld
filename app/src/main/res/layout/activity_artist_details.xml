@@ -22,76 +22,11 @@
         <TextView
             android:fontFamily="sans-serif-light"
             android:layout_below="@+id/artistProfile"
-            android:id="@+id/tvFruitDescription"
+            android:id="@+id/tvArtistWriteUp"
             android:text="description"
             android:layout_margin="16dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
-
-        <LinearLayout
-            android:id="@+id/LDetails"
-            android:layout_marginLeft="16dp"
-            android:layout_below="@+id/tvFruitDescription"
-            android:orientation="vertical"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:fontFamily="sans-serif-light"
-                android:id="@+id/tvFruitUnitPrice"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#2F4F4F"
-                android:textSize="13dp"
-                android:layout_marginTop="9dp"
-                android:text="Price : R10.00" />
-
-
-
-            <TextView
-                android:fontFamily="sans-serif-light"
-                android:id="@+id/tvArtCategory"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#2F4F4F"
-                android:textSize="13dp"
-                android:layout_marginTop="4dp"
-                android:text="" />
-
-            <TextView
-                android:fontFamily="sans-serif-light"
-                android:textStyle="bold"
-                android:id="@+id/tvArtSeller"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#2F4F4F"
-                android:textSize="13dp"
-                android:layout_marginTop="4dp"
-                android:text="" />
-
-            <TextView
-                android:visibility="gone"
-                android:id="@+id/tvFruitQuantity"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#2F4F4F"
-                android:textSize="13dp"
-                android:layout_marginTop="4dp"
-                android:text="Quantity : 10" />
-
-            <TextView
-                android:fontFamily="sans-serif-light"
-                android:visibility="gone"
-                android:textStyle="bold"
-                android:id="@+id/tvFruitSubTotal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#2F4F4F"
-                android:textSize="13dp"
-                android:layout_marginTop="4dp"
-                android:text="Sub Total : R100.00" />
-
-        </LinearLayout>
 
     </RelativeLayout>
 

@@ -4,7 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.media.AudioManager;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,11 +24,15 @@ import com.bumptech.glide.Glide;
 import com.jukebox.world.R;
 import com.jukebox.world.ViewModel.Track;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
 public class AlbumTracksAdapter extends RecyclerView.Adapter<AlbumTracksAdapter.ViewHolder> {
 
-    private Context context;
+    private static Context context2;
+    public Context context;
     public ArrayList<Track> trackArrayList;
     private MediaPlayer mediaPlayer = new MediaPlayer();
 
@@ -39,6 +45,7 @@ public class AlbumTracksAdapter extends RecyclerView.Adapter<AlbumTracksAdapter.
     @Override
     public AlbumTracksAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         context = parent.getContext();
+        context2 = parent.getContext();
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.tracks_cardview, parent, false);
         ViewHolder viewHolder = new ViewHolder(v);
         return viewHolder;
@@ -48,6 +55,8 @@ public class AlbumTracksAdapter extends RecyclerView.Adapter<AlbumTracksAdapter.
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         final Track track = trackArrayList.get(position);
         holder.textViewTrackTitle.setText(track.getTitle());
+        String milliseconds =  getDuration(track.getUrl());
+        holder.textViewTrackTime.setText(milliseconds);
         Glide.with(context).load(track.getUrl()).into(holder.imageViewCover);
 
         holder.imageViewPlayTrack.setImageDrawable(ContextCompat.getDrawable(context, android.R.drawable.ic_media_play));
@@ -75,6 +84,15 @@ public class AlbumTracksAdapter extends RecyclerView.Adapter<AlbumTracksAdapter.
                             mediaPlayer.prepare();
                             mediaPlayer.start();
                             mSeekbarUpdateHandler.postDelayed(mUpdateSeekbar, 0);
+                            mSeekbarUpdateHandler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    int duration = mediaPlayer.getCurrentPosition();
+                                    String time = String.format("%02d:%02d ", TimeUnit.MILLISECONDS.toMinutes(duration), TimeUnit.MILLISECONDS.toSeconds(duration) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(duration)));
+                                    holder.textViewTrackTime.setText(time);
+                                    mSeekbarUpdateHandler.postDelayed(this,1000);
+                                }
+                            });
 
                         } catch (Exception e) {
 
@@ -82,8 +100,6 @@ public class AlbumTracksAdapter extends RecyclerView.Adapter<AlbumTracksAdapter.
 
                         if (mediaPlayer != null && mediaPlayer.isPlaying()) {
                             holder.seekBar.setMax(mediaPlayer.getDuration());
-
-
                         }
 
 
@@ -120,11 +136,38 @@ public class AlbumTracksAdapter extends RecyclerView.Adapter<AlbumTracksAdapter.
 
             }
         });
+
+
     }
 
    private Handler mSeekbarUpdateHandler = new Handler();
 
+    private static String getDuration(String pathStr) {
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+        retriever.setDataSource(pathStr, new HashMap<String, String>());
+        String time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+        long timeInMillisec = Long.parseLong(time);
+        retriever.release();
+        String duration = convertMillieToHMmSs(timeInMillisec); //use this duration
 
+        return duration;
+    }
+
+    public static String convertMillieToHMmSs(long millie) {
+        long seconds = (millie / 1000);
+        long second = seconds % 60;
+        long minute = (seconds / 60) % 60;
+        long hour = (seconds / (60 * 60)) % 24;
+
+        String result = "";
+        if (hour > 0) {
+            return String.format("%02d:%02d:%02d", hour, minute, second);
+        }
+        else {
+            return String.format("%02d:%02d" , minute, second);
+        }
+
+    }
 
     @Override
     public int getItemCount() {
@@ -135,6 +178,7 @@ public class AlbumTracksAdapter extends RecyclerView.Adapter<AlbumTracksAdapter.
         public ImageView imageViewCover;
         public ImageView imageViewPlayTrack;
         public TextView textViewTrackTitle;
+        public TextView textViewTrackTime;
         public SeekBar seekBar;
 
 
@@ -144,6 +188,7 @@ public class AlbumTracksAdapter extends RecyclerView.Adapter<AlbumTracksAdapter.
             textViewTrackTitle = (TextView) itemView.findViewById(R.id.tvTrackTitle);
             imageViewCover = (ImageView) itemView.findViewById(R.id.imgTrackAlbum);
             imageViewPlayTrack = (ImageView) itemView.findViewById(R.id.imgPlayTrack);
+            textViewTrackTime = (TextView) itemView.findViewById(R.id.tvTrackTime);
             seekBar = (SeekBar) itemView.findViewById(R.id.song_seekbar);
         }
     }

@@ -52,6 +52,9 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
             public void onClick(View v) {
                 Intent intent = new Intent(context, AlbumTracksActivity.class);
                 intent.putExtra("albumTitle",album.getTitle());
+                intent.putExtra("albumPrice",album.getPrice());
+                intent.putExtra("albumCover",album.getCoverImageUrl());
+                intent.putExtra("albumArtist",album.getArtist());
                 context.startActivity(intent);
             }
         });
