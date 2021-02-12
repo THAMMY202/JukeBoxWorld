@@ -57,7 +57,7 @@ public class AlbumTracksAdapter extends RecyclerView.Adapter<AlbumTracksAdapter.
         holder.textViewTrackTitle.setText(track.getTitle());
         String milliseconds =  getDuration(track.getUrl());
         holder.textViewTrackTime.setText(milliseconds);
-        Glide.with(context).load(track.getUrl()).into(holder.imageViewCover);
+        Glide.with(context).load(track.getCover()).into(holder.imageViewTrackCover);
 
         holder.imageViewPlayTrack.setImageDrawable(ContextCompat.getDrawable(context, android.R.drawable.ic_media_play));
         holder.imageViewPlayTrack.setOnClickListener(new View.OnClickListener() {
@@ -175,7 +175,7 @@ public class AlbumTracksAdapter extends RecyclerView.Adapter<AlbumTracksAdapter.
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
-        public ImageView imageViewCover;
+        public ImageView imageViewTrackCover;
         public ImageView imageViewPlayTrack;
         public TextView textViewTrackTitle;
         public TextView textViewTrackTime;
@@ -186,7 +186,7 @@ public class AlbumTracksAdapter extends RecyclerView.Adapter<AlbumTracksAdapter.
             super(itemView);
 
             textViewTrackTitle = (TextView) itemView.findViewById(R.id.tvTrackTitle);
-            imageViewCover = (ImageView) itemView.findViewById(R.id.imgTrackAlbum);
+            imageViewTrackCover = (ImageView) itemView.findViewById(R.id.imgTrackAlbum);
             imageViewPlayTrack = (ImageView) itemView.findViewById(R.id.imgPlayTrack);
             textViewTrackTime = (TextView) itemView.findViewById(R.id.tvTrackTime);
             seekBar = (SeekBar) itemView.findViewById(R.id.song_seekbar);

@@ -20,6 +20,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.jukebox.world.MusicCategoryRecyclerViewAdapter;
 import com.jukebox.world.R;
@@ -37,7 +38,7 @@ public class HomeFragment extends Fragment implements MusicCategoryRecyclerViewA
     private MusicCategoryRecyclerViewAdapter adapter;
     private Hashtable items = new Hashtable();
 
-    private GridLayoutManager layoutManager;
+    private GridLayoutManager layoutManager,artistlayoutManager;
     private RecyclerView albumsRecyclerView,artistRecyclerView;
     private ArrayList<AlbumDetails> albumDetailsArrayList = new ArrayList<>();
     private ArrayList<Artist> artistArrayList = new ArrayList<>();
@@ -63,21 +64,22 @@ public class HomeFragment extends Fragment implements MusicCategoryRecyclerViewA
         albumsRecyclerView.setAdapter(albumAdapter);
 
 
-        //layoutManager = new GridLayoutManager(getActivity(), 2);
+        artistlayoutManager = new GridLayoutManager(getActivity(), 2);
         artistAdapter = new ArtistAdapter(getActivity(),artistArrayList);
         artistRecyclerView.setAdapter(artistAdapter);
 
 
-        albumsRecyclerView.setHasFixedSize(true);
-        artistRecyclerView.setHasFixedSize(true);
+       // albumsRecyclerView.setHasFixedSize(true);
+       // artistRecyclerView.setHasFixedSize(true);
 
         if (checkIsTablet()) {
             albumsRecyclerView.setLayoutManager(layoutManager);
-            artistRecyclerView.setLayoutManager(layoutManager);
+            artistRecyclerView.setLayoutManager(artistlayoutManager);
         } else {
             albumsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
             artistRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         }
+
 
         getAllAlbums();
         getAllArtist();
@@ -117,10 +119,22 @@ public class HomeFragment extends Fragment implements MusicCategoryRecyclerViewA
                     }
                 }
 
-                LinearLayoutManager horizontalLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
+                /*LinearLayoutManager horizontalLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
                 albumsRecyclerView.setLayoutManager(horizontalLayoutManager);
                 albumAdapter = new AlbumAdapter(getActivity(),albumDetailsArrayList);
-                albumsRecyclerView.setAdapter(albumAdapter);
+                albumsRecyclerView.setAdapter(albumAdapter);*/
+
+
+                if (checkIsTablet()) {
+                    GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(),4);
+                    gridLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+                    albumsRecyclerView.setLayoutManager(gridLayoutManager);
+                } else {
+                    GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(),2);
+                    gridLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+                    albumsRecyclerView.setLayoutManager(gridLayoutManager);
+                }
+
             }
 
             @Override
@@ -133,7 +147,8 @@ public class HomeFragment extends Fragment implements MusicCategoryRecyclerViewA
     private void getAllArtist() {
 
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Users").child("Customers");
-        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+        Query albumsQuery = ref.orderByChild("role").equalTo("Artist");
+        albumsQuery.addListenerForSingleValueEvent(new ValueEventListener() {
 
             Artist artist;
 

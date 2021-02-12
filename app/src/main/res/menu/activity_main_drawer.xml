@@ -18,7 +18,7 @@
             android:title="New Release"/>
 
         <item
-            android:id="@+id/nav_payment"
+            android:id="@+id/nav_banking_details"
             android:icon="@drawable/payment"
             android:title="Payment Methods"/>
     </group>

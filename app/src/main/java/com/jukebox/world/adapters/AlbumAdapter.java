@@ -27,6 +27,7 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
     private Context context;
     public ArrayList<AlbumDetails> albumDetails;
 
+
     public AlbumAdapter(Context context, ArrayList<AlbumDetails> albumDetails) {
         this.albumDetails = albumDetails;
         this.context = context;
@@ -37,6 +38,7 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
     public AlbumAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         context = parent.getContext();
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.albums_cardview, parent, false);
+
         ViewHolder viewHolder = new ViewHolder(v);
         return viewHolder;
     }

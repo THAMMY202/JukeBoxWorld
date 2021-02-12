@@ -1,18 +1,12 @@
 package com.jukebox.world;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.GestureDetector;
 import android.view.MenuItem;
 import android.view.Menu;
-import android.view.MotionEvent;
+
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.animation.AnimationUtils;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,9 +21,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.jukebox.world.ViewModel.AdsSlideViewModel;
-import com.jukebox.world.ui.SocailActivity;
 import com.squareup.picasso.Picasso;
 
+import androidx.core.app.ShareCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -55,6 +49,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     private ViewFlipper viewFlipper;
     private DatabaseReference databaseReference;
     private List<AdsSlideViewModel> slideLists;
+    private ImageView imageViewShareApp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +77,18 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
         mProfileImage = header.findViewById(R.id.profileImage);
         mprofileName = header.findViewById(R.id.profileName);
+
+        imageViewShareApp = findViewById(R.id.imgAppShare);
+        imageViewShareApp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ShareCompat.IntentBuilder.from(MainActivity.this)
+                        .setType("text/plain")
+                        .setChooserTitle("Share With")
+                        .setText("http://play.google.com/store/apps/details?id=" + MainActivity.this.getPackageName())
+                        .startChooser();
+            }
+        });
 
 
         databaseReference = FirebaseDatabase.getInstance().getReference();

@@ -7,8 +7,10 @@
     tools:context=".ui.ArtistDetailsActivity">
 
     <RelativeLayout
+        android:id="@+id/ArtistRelativeLayout"
+        android:layout_alignParentStart="true"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
         <ImageView
             android:layout_margin="5dp"
@@ -29,5 +31,50 @@
             android:layout_height="wrap_content" />
 
     </RelativeLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_below="@+id/ArtistRelativeLayout"
+        android:id="@+id/recyclerViewArtist"
+        android:layout_width="match_parent"
+        android:clipToPadding="false"
+        android:layout_height="wrap_content"/>
+
+    <LinearLayout
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="16dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/imageViewFacebook"
+            android:src="@drawable/facebook"
+            android:layout_width="40dp"
+            android:layout_height="30dp"/>
+
+        <ImageView
+            android:id="@+id/imageViewTwitter"
+            android:layout_marginLeft="7dp"
+            android:src="@drawable/twitter"
+            android:layout_width="40dp"
+            android:layout_height="30dp"/>
+
+        <ImageView
+            android:id="@+id/imageViewYouTube"
+            android:layout_marginLeft="7dp"
+            android:src="@drawable/youtube"
+            android:layout_width="40dp"
+            android:layout_height="30dp"/>
+
+        <ImageView
+            android:id="@+id/imageViewInstagram"
+            android:layout_marginLeft="7dp"
+            android:src="@drawable/instagram"
+            android:layout_width="40dp"
+            android:layout_height="30dp"/>
+
+    </LinearLayout>
 
 </RelativeLayout>

@@ -102,7 +102,7 @@
                 android:layout_alignParentRight="true"
                 android:background="@drawable/roundbuybutton"
                 android:text="BUY"
-                android:textColor="@android:color/white"
+                android:textColor="@android:color/black"
                 app:fontFamily="@font/josefinslabbold" />
         </RelativeLayout>
 

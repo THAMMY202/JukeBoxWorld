@@ -7,11 +7,15 @@ import androidx.palette.graphics.Palette;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -30,8 +34,10 @@ import com.google.firebase.database.ValueEventListener;
 
 import com.jukebox.world.ViewModel.Track;
 import com.jukebox.world.adapters.AlbumTracksAdapter;
-import java.util.ArrayList;
 
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
 
 
 //For payment
@@ -50,6 +56,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import com.paypal.android.sdk.payments.PayPalConfiguration;
+import com.paypal.android.sdk.payments.PayPalPayment;
+import com.paypal.android.sdk.payments.PayPalService;
+import com.paypal.android.sdk.payments.PaymentActivity;
+import com.paypal.android.sdk.payments.PaymentConfirmation;
+import com.paypal.android.sdk.payments.ProofOfPayment;
 import com.stripe.android.ApiResultCallback;
 import com.stripe.android.PaymentIntentResult;
 import com.stripe.android.Stripe;
@@ -57,6 +69,9 @@ import com.stripe.android.model.ConfirmPaymentIntentParams;
 import com.stripe.android.model.PaymentIntent;
 import com.stripe.android.model.PaymentMethodCreateParams;
 import com.stripe.android.view.CardInputWidget;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -75,10 +90,10 @@ import okhttp3.Response;
 public class AlbumTracksActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
-    private DatabaseReference mCustomerDatabase,mArtistDatabase;
+    private DatabaseReference mCustomerDatabase, mArtistDatabase;
     private String userID;
 
-    private String albumTitle,albumPrice,albumCover,albumArtist,albumArtistUserKey;
+    private String albumTitle, albumPrice, albumCover, albumArtist, albumArtistUserKey;
 
     private RecyclerView tracksRecyclerView;
     private ArrayList<Track> trackArrayList = new ArrayList<>();
@@ -87,14 +102,9 @@ public class AlbumTracksActivity extends AppCompatActivity {
     private Button buttonPay;
     private ProgressBar progressBar;
 
-    private static final String BACKEND_URL = "http://10.0.2.2:4242/";
-
-    private OkHttpClient httpClient = new OkHttpClient();
-    private String paymentIntentClientSecret;
-    private Stripe stripe;
 
     private RelativeLayout relativeLayoutButton;
-    private  CardInputWidget cardInputWidget;
+    private CardInputWidget cardInputWidget;
 
     private ImageView imageViewAlbumCover;
 
@@ -102,6 +112,9 @@ public class AlbumTracksActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
         setContentView(R.layout.activity_album_tracks);
 
         albumTitle = getIntent().getStringExtra("albumTitle");
@@ -122,6 +135,7 @@ public class AlbumTracksActivity extends AppCompatActivity {
                     }
                 });
 
+
         textViewalbumPrice = findViewById(R.id.tvAlbumPrice);
         relativeLayoutButton = findViewById(R.id.RelativeLayoutBuy);
 
@@ -130,12 +144,12 @@ public class AlbumTracksActivity extends AppCompatActivity {
         cardInputWidget.setVisibility(View.GONE);
         progressBar.setVisibility(View.VISIBLE);
 
-        configPayment();
-        startCheckout();
+        if (!albumPrice.isEmpty()) {
+            DecimalFormat df = new DecimalFormat("0.00##");
+            String result = df.format(Double.parseDouble(albumPrice));
+            textViewalbumPrice.setText("R" + result);
 
-        if(!albumPrice.isEmpty()){
-            textViewalbumPrice.setText("R"+albumPrice);
-        }else {
+        } else {
             textViewalbumPrice.setText("Free");
         }
 
@@ -152,6 +166,14 @@ public class AlbumTracksActivity extends AppCompatActivity {
         tracksRecyclerView.setAdapter(albumTracksAdapter);
 
         getAllTracks();
+
+        buttonPay = findViewById(R.id.payButton);
+        buttonPay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                payPalPayment();
+            }
+        });
     }
 
     public void createPaletteAsync(Bitmap bitmap) {
@@ -159,10 +181,10 @@ public class AlbumTracksActivity extends AppCompatActivity {
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             public void onGenerated(Palette p) {
 
-                try{
+                try {
                     Palette.Swatch vibrantSwatch = checkVibrantSwatch(p);
 
-                    Toolbar toolbar =  findViewById(R.id.toolbar2);
+                    Toolbar toolbar = findViewById(R.id.toolbar2);
                     toolbar.setTitle(albumArtist);
                     toolbar.setSubtitle(albumTitle);
 
@@ -170,8 +192,8 @@ public class AlbumTracksActivity extends AppCompatActivity {
                     toolbar.setTitleTextColor(vibrantSwatch.getTitleTextColor());
                     setSupportActionBar(toolbar);
 
-                }catch (Exception e){
-                    Toolbar toolbar =  findViewById(R.id.toolbar2);
+                } catch (Exception e) {
+                    Toolbar toolbar = findViewById(R.id.toolbar2);
                     toolbar.setTitle(albumArtist);
                     toolbar.setSubtitle(albumTitle);
                     setSupportActionBar(toolbar);
@@ -197,32 +219,33 @@ public class AlbumTracksActivity extends AppCompatActivity {
     private void getAllTracks() {
 
         mCustomerDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        trackArrayList.clear();
-                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                            track = new Track();
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                trackArrayList.clear();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    track = new Track();
 
-                            track.setType(snapshot.child("trackType").getValue().toString());
-                            track.setFeature(snapshot.child("trackFeature").getValue().toString());
-                            track.setTitle(snapshot.child("trackTitle").getValue().toString());
-                            track.setUrl(snapshot.child("trackUrl").getValue().toString());
-                            trackArrayList.add(track);
+                    track.setType(snapshot.child("trackType").getValue().toString());
+                    track.setFeature(snapshot.child("trackFeature").getValue().toString());
+                    track.setTitle(snapshot.child("trackTitle").getValue().toString());
+                    track.setUrl(snapshot.child("trackUrl").getValue().toString());
+                    track.setCover(snapshot.child("trackCover").getValue().toString());
+                    trackArrayList.add(track);
 
-                        }
+                }
 
-                        LinearLayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
-                        tracksRecyclerView.setLayoutManager(mLayoutManager);
-                        albumTracksAdapter = new AlbumTracksAdapter(AlbumTracksActivity.this, trackArrayList);
-                        tracksRecyclerView.setAdapter(albumTracksAdapter);
+                LinearLayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+                tracksRecyclerView.setLayoutManager(mLayoutManager);
+                albumTracksAdapter = new AlbumTracksAdapter(AlbumTracksActivity.this, trackArrayList);
+                tracksRecyclerView.setAdapter(albumTracksAdapter);
 
-                        progressBar.setVisibility(View.GONE);
-                    }
+                progressBar.setVisibility(View.GONE);
+            }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                    }
-                });
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
 
     }
 
@@ -235,9 +258,7 @@ public class AlbumTracksActivity extends AppCompatActivity {
 
                     if (map.get("stageName") != null) {
                         albumArtist = map.get("stageName").toString().trim();
-                    }
-
-                    else if (map.get("firstName") != null) {
+                    } else if (map.get("firstName") != null) {
                         albumArtist = map.get("firstName").toString().trim();
                     }
 
@@ -250,156 +271,52 @@ public class AlbumTracksActivity extends AppCompatActivity {
         });
     }
 
-    private void configPayment() {
-        // Configure the SDK with your Stripe publishable key so it can make requests to Stripe
-        stripe = new Stripe(
-                getApplicationContext(),
-                Objects.requireNonNull("pk_test_EWyVlmphMKYGEsIo8QAneKCW")
-        );
-    }
+    private int PAYPAL_REQUEST_CODE = 1;
+    private static PayPalConfiguration config = new PayPalConfiguration().environment(PayPalConfiguration.ENVIRONMENT_SANDBOX).clientId(PayPalConfig.PAYPAL_CLIENT_ID);
 
-    private void startCheckout() {
-        // Create a PaymentIntent by calling the server's endpoint.
-        /*MediaType mediaType = MediaType.get("application/json; charset=utf-8");
-       String json = "{"
-                + ""currency":"usd","
-                + ""items":["
-                + "{"id":"photo_subscription"}"
-                + "]"
-                + "}";
+    private void payPalPayment() {
+        double dollors_current = 0.059;
+        Double randsPrice = Double.parseDouble(albumPrice);
+        double dollors = randsPrice / dollors_current;
 
-                RequestBody body = RequestBody.create(json, mediaType);
-        Request request = new Request.Builder()
-                .url(BACKEND_URL + "create-payment-intent")
-                .post(body)
-                .build();
-        httpClient.newCall(request).enqueue(new PayCallback(AlbumTracksActivity.this));
-
-        // Hook up the pay button to the card widget and stripe instance
-        Button payButton = findViewById(R.id.payButton);
-        payButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                CardInputWidget cardInputWidget = findViewById(R.id.cardInputWidget);
-                PaymentMethodCreateParams params = cardInputWidget.getPaymentMethodCreateParams();
-                if (params != null) {
-                    ConfirmPaymentIntentParams confirmParams = ConfirmPaymentIntentParams.createWithPaymentMethodCreateParams(params, paymentIntentClientSecret);
-                    stripe.confirmPayment(AlbumTracksActivity.this, confirmParams);
-                }
-            }
-        });*/
-
-        Button payButton = findViewById(R.id.payButton);
-        payButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                tracksRecyclerView.setVisibility(View.GONE);
-                relativeLayoutButton.setVisibility(View.GONE);
-                progressBar.setVisibility(View.GONE);
-                cardInputWidget.setVisibility(View.VISIBLE);
-            }
-        });
-    }
-
-    private void displayAlert(@NonNull String title,
-                              @Nullable String message) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this)
-                .setTitle(title)
-                .setMessage(message);
-
-        builder.setPositiveButton("Ok", null);
-        builder.create().show();
+        PayPalPayment payment = new PayPalPayment(new BigDecimal(dollors), "USD", albumTitle+" cost",PayPalPayment.PAYMENT_INTENT_SALE);
+        payment.enablePayPalShippingAddressesRetrieval(true);
+        Intent intent = new Intent(AlbumTracksActivity.this, PaymentActivity.class);
+        intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION,config);
+        intent.putExtra(PaymentActivity.EXTRA_PAYMENT, payment);
+        startActivityForResult(intent, PAYPAL_REQUEST_CODE);
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        // Handle the result of stripe.confirmPayment
-        stripe.onPaymentResult(requestCode, data, new PaymentResultCallback(AlbumTracksActivity.this));
-    }
+        if (requestCode == PAYPAL_REQUEST_CODE){
+            if(resultCode == Activity.RESULT_OK){
+                PaymentConfirmation confirm = data.getParcelableExtra(PaymentActivity.EXTRA_RESULT_CONFIRMATION);
 
-    private void onPaymentSuccess(@NonNull final Response response) throws IOException {
-        Gson gson = new Gson();
-        Type type = new TypeToken<Map<String, String>>(){}.getType();
-        Map<String, String> responseMap = gson.fromJson(
-                Objects.requireNonNull(response.body()).string(),
-                type
-        );
+                ProofOfPayment proof = confirm.getProofOfPayment();
+                PayPalPayment payment = confirm.getPayment();
+                payment.enablePayPalShippingAddressesRetrieval(true);
 
-        paymentIntentClientSecret = responseMap.get("clientSecret");
-    }
+                if(confirm != null){
+                    try{
+                        JSONObject jsonObj = new JSONObject(confirm.toJSONObject().toString());
 
-    private static final class PayCallback implements Callback {
-        @NonNull private final WeakReference<AlbumTracksActivity> activityRef;
+                        String paymentResponse = jsonObj.getJSONObject("response").getString("state");
 
-        PayCallback(@NonNull AlbumTracksActivity activity) {
-            activityRef = new WeakReference<>(activity);
-        }
+                        if(paymentResponse.equals("approved")){
+                            Toast.makeText(AlbumTracksActivity.this, "Payment successful", Toast.LENGTH_LONG).show();
+                            Toast.makeText(AlbumTracksActivity.this, proof.toString(), Toast.LENGTH_LONG).show();
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
 
-        @Override
-        public void onFailure(@NonNull Call call, @NonNull IOException e) {
-            final AlbumTracksActivity activity = activityRef.get();
-            if (activity == null) {
-                return;
+            }else{
+
+                Toast.makeText(AlbumTracksActivity.this, "Payment unsuccessful", Toast.LENGTH_LONG).show();
             }
-
-            Toast.makeText(activity, "Error: " + e.toString(), Toast.LENGTH_LONG).show();
-        }
-
-        @Override
-        public void onResponse(@NonNull Call call, @NonNull final Response response)
-                throws IOException {
-            final AlbumTracksActivity activity = activityRef.get();
-            if (activity == null) {
-                return;
-            }
-
-            if (!response.isSuccessful()) {
-                Toast.makeText(activity, "Error: " + response.toString(), Toast.LENGTH_LONG).show();
-            } else {
-                activity.onPaymentSuccess(response);
-            }
-        }
-    }
-
-    private static final class PaymentResultCallback
-            implements ApiResultCallback<PaymentIntentResult> {
-        @NonNull private final WeakReference<AlbumTracksActivity> activityRef;
-
-        PaymentResultCallback(@NonNull AlbumTracksActivity activity) {
-            activityRef = new WeakReference<>(activity);
-        }
-
-        @Override
-        public void onSuccess(@NonNull PaymentIntentResult result) {
-            final AlbumTracksActivity activity = activityRef.get();
-            if (activity == null) {
-                return;
-            }
-
-            PaymentIntent paymentIntent = result.getIntent();
-            PaymentIntent.Status status = paymentIntent.getStatus();
-            if (status == PaymentIntent.Status.Succeeded) {
-                // Payment completed successfully
-                Gson gson = new GsonBuilder().setPrettyPrinting().create();
-                activity.displayAlert("Payment completed",gson.toJson(paymentIntent)
-                );
-            } else if (status == PaymentIntent.Status.RequiresPaymentMethod) {
-                // Payment failed – allow retrying using a different payment method
-                activity.displayAlert("Payment failed", Objects.requireNonNull(paymentIntent.getLastPaymentError()).getMessage()
-                );
-            }
-        }
-
-        @Override
-        public void onError(@NonNull Exception e) {
-            final AlbumTracksActivity activity = activityRef.get();
-            if (activity == null) {
-                return;
-            }
-
-            // Payment request failed – allow retrying using the same payment method
-            activity.displayAlert("Error", e.toString());
         }
     }
 
