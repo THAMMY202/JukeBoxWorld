@@ -9,16 +9,18 @@ public class AlbumDetails {
     private String genre;
     private String price;
     private String artist;
+    private Boolean isPublished;
 
     public AlbumDetails(){}
 
-    public AlbumDetails(String coverImageUrl, String title, String realiseDate, String genre, String price,String artist) {
+    public AlbumDetails(String coverImageUrl, String title, String realiseDate, String genre, String price,String artist,Boolean isPublished) {
         this.coverImageUrl = coverImageUrl;
         this.title = title;
         this.realiseDate = realiseDate;
         this.genre = genre;
         this.price = price;
         this.artist = artist;
+        this.isPublished = isPublished;
     }
 
     @Override
@@ -43,6 +45,14 @@ public class AlbumDetails {
         this.artist = artist;
     }
 
+    public Boolean getPublished() {
+        return isPublished;
+    }
+
+    public void setPublished(Boolean published) {
+        isPublished = published;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -53,6 +63,7 @@ public class AlbumDetails {
                 Objects.equals(getRealiseDate(), that.getRealiseDate()) &&
                 Objects.equals(getGenre(), that.getGenre()) &&
                 Objects.equals(getPrice(), that.getPrice())  &&
+                Objects.equals(getPublished(), that.getPublished())  &&
                 Objects.equals(getArtist(), that.getArtist());
     }
 

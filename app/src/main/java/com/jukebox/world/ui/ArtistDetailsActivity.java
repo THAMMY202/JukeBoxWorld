@@ -13,6 +13,7 @@ import android.view.Display;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
@@ -24,6 +25,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.jukebox.world.R;
 import com.jukebox.world.ViewModel.AlbumDetails;
+import com.jukebox.world.ViewModel.Artist;
 import com.jukebox.world.ViewModel.SocialModel;
 import com.jukebox.world.adapters.AlbumAdapter;
 
@@ -38,29 +40,35 @@ public class ArtistDetailsActivity extends AppCompatActivity {
     private ArrayList<AlbumDetails> albumDetailsArrayList = new ArrayList<>();
     private String ArtistUserID;
 
-    private  ImageView imageViewFacebook,imageViewTwitter,imageViewYouTube,imageViewInstagram;
-    private  String facebookUrl,twitterUrl,youTubeUrl,instagramUrl;
+    private ImageView imageViewFacebook, imageViewTwitter, imageViewYouTube, imageViewInstagram;
+    private String facebookUrl, twitterUrl, youTubeUrl, instagramUrl;
+
+    private FirebaseAuth mAuth;
+    private  String artistStageName;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_artist_details);
 
+        mAuth = FirebaseAuth.getInstance();
+
         findByID();
 
         ArtistUserID = getIntent().getStringExtra("artistKey");
         String firstName = getIntent().getStringExtra("firstName");
         String lastName = getIntent().getStringExtra("lastName");
-        String artistStageName = getIntent().getStringExtra("artistStageName");
+        artistStageName = getIntent().getStringExtra("artistStageName");
 
-        getSupportActionBar().setSubtitle(setToUpperCase(firstName)+ " " + setToUpperCase(lastName));
+        getSupportActionBar().setSubtitle(setToUpperCase(firstName) + " " + setToUpperCase(lastName));
         String image = getIntent().getStringExtra("artistImage");
 
-        textViewArtistWriteUp.setText(setToUpperCase(firstName) + " " + setToUpperCase(lastName) + " , "+"known professionally as " + artistStageName);
+        textViewArtistWriteUp.setText(setToUpperCase(firstName) + " " + setToUpperCase(lastName) + " , " + "known professionally as " + artistStageName);
 
-        if(!image.isEmpty()){
+        if (!image.isEmpty()) {
             Glide.with(getApplicationContext()).load(image).into(imageViewProfile);
-        }else {
+        } else {
             imageViewProfile.setImageDrawable(getDrawable(R.drawable.artistholder));
         }
 
@@ -70,41 +78,59 @@ public class ArtistDetailsActivity extends AppCompatActivity {
         imageViewFacebook.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(Intent.ACTION_VIEW);
-                i.setData(Uri.parse(facebookUrl));
-                startActivity(i);
+                if (facebookUrl != null && !facebookUrl.isEmpty()) {
+                    Intent i = new Intent(Intent.ACTION_VIEW);
+                    i.setData(Uri.parse(facebookUrl));
+                    startActivity(i);
+                } else {
+
+                    Toast.makeText(ArtistDetailsActivity.this, artistStageName + " is not available on facebook as yet ", Toast.LENGTH_LONG).show();
+                }
             }
         });
 
         imageViewTwitter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(Intent.ACTION_VIEW);
-                i.setData(Uri.parse(twitterUrl));
-                startActivity(i);
+
+                if (twitterUrl != null && !twitterUrl.isEmpty()) {
+                    Intent i = new Intent(Intent.ACTION_VIEW);
+                    i.setData(Uri.parse(twitterUrl));
+                    startActivity(i);
+                } else {
+                    Toast.makeText(ArtistDetailsActivity.this, artistStageName + " is not available on twitte as yet ", Toast.LENGTH_LONG).show();
+                }
             }
         });
 
         imageViewYouTube.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(Intent.ACTION_VIEW);
-                i.setData(Uri.parse(youTubeUrl));
-                startActivity(i);
+                if (youTubeUrl != null && !youTubeUrl.isEmpty()) {
+                    Intent i = new Intent(Intent.ACTION_VIEW);
+                    i.setData(Uri.parse(youTubeUrl));
+                    startActivity(i);
+                } else {
+                    Toast.makeText(ArtistDetailsActivity.this, artistStageName + " is not available on youTube as yet ", Toast.LENGTH_LONG).show();
+                }
             }
         });
 
         imageViewInstagram.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(Intent.ACTION_VIEW);
-                i.setData(Uri.parse(instagramUrl));
-                startActivity(i);
+                if (instagramUrl != null && !instagramUrl.isEmpty()) {
+                    Intent i = new Intent(Intent.ACTION_VIEW);
+                    i.setData(Uri.parse(instagramUrl));
+                    startActivity(i);
+                } else {
+                    Toast.makeText(ArtistDetailsActivity.this, artistStageName + " is not available on instagram as yet ", Toast.LENGTH_LONG).show();
+                }
             }
         });
     }
 
-    private void findByID(){
+    private void findByID() {
         imageViewProfile = findViewById(R.id.artistProfile);
         imageViewFacebook = findViewById(R.id.imageViewFacebook);
         imageViewTwitter = findViewById(R.id.imageViewTwitter);
@@ -113,7 +139,7 @@ public class ArtistDetailsActivity extends AppCompatActivity {
 
         textViewArtistWriteUp = findViewById(R.id.tvArtistWriteUp);
         albumsRecyclerView = findViewById(R.id.recyclerViewArtist);
-        albumAdapter = new AlbumAdapter(ArtistDetailsActivity.this,albumDetailsArrayList);
+        albumAdapter = new AlbumAdapter(ArtistDetailsActivity.this, albumDetailsArrayList, mAuth.getCurrentUser().getUid());
         albumsRecyclerView.setAdapter(albumAdapter);
     }
 
@@ -127,17 +153,17 @@ public class ArtistDetailsActivity extends AppCompatActivity {
 
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot requestSnapshot: dataSnapshot.getChildren()) {
+                for (DataSnapshot requestSnapshot : dataSnapshot.getChildren()) {
                     DataSnapshot productsSnapshot = requestSnapshot.child("albums");
-                    for (DataSnapshot ds: productsSnapshot.getChildren()) {
+                    for (DataSnapshot ds : productsSnapshot.getChildren()) {
 
                         if (ds.hasChild("albumCoverUrl") && ds.hasChild("albumGenre") && ds.hasChild("albumRealiseDate") && ds.hasChild("albumTitle")) {
 
-                            albumDetails  = new AlbumDetails();
+                            albumDetails = new AlbumDetails();
                             albumDetails.setGenre(ds.child("albumGenre").getValue().toString());
                             albumDetails.setTitle(ds.child("albumTitle").getValue().toString());
                             albumDetails.setCoverImageUrl(ds.child("albumCoverUrl").getValue().toString());
-                            albumDetails.setRealiseDate(""+ds.child("albumRealiseDate").getValue());
+                            albumDetails.setRealiseDate("" + ds.child("albumRealiseDate").getValue());
                             albumDetails.setPrice(ds.child("albumPrice").getValue().toString());
                             albumDetails.setArtist(ds.child("albumArtist").getValue().toString());
                             albumDetailsArrayList.add(albumDetails);
@@ -147,20 +173,20 @@ public class ArtistDetailsActivity extends AppCompatActivity {
 
 
                 if (checkIsTablet()) {
-                    GridLayoutManager gridLayoutManager = new GridLayoutManager(ArtistDetailsActivity.this,4);
+                    GridLayoutManager gridLayoutManager = new GridLayoutManager(ArtistDetailsActivity.this, 4);
                     gridLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
                     albumsRecyclerView.setLayoutManager(gridLayoutManager);
-                    albumAdapter = new AlbumAdapter(ArtistDetailsActivity.this,albumDetailsArrayList);
+                    albumAdapter = new AlbumAdapter(ArtistDetailsActivity.this, albumDetailsArrayList, mAuth.getCurrentUser().getUid());
                     albumsRecyclerView.setAdapter(albumAdapter);
                 } else {
-                    GridLayoutManager gridLayoutManager = new GridLayoutManager(ArtistDetailsActivity.this,2);
+                    GridLayoutManager gridLayoutManager = new GridLayoutManager(ArtistDetailsActivity.this, 2);
                     gridLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
                     albumsRecyclerView.setLayoutManager(gridLayoutManager);
-                    albumAdapter = new AlbumAdapter(ArtistDetailsActivity.this,albumDetailsArrayList);
+                    albumAdapter = new AlbumAdapter(ArtistDetailsActivity.this, albumDetailsArrayList, mAuth.getCurrentUser().getUid());
                     albumsRecyclerView.setAdapter(albumAdapter);
                 }
 
-              }
+            }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
@@ -169,10 +195,10 @@ public class ArtistDetailsActivity extends AppCompatActivity {
         });
     }
 
-    private String setToUpperCase(String toUpper){
+    private String setToUpperCase(String toUpper) {
         String upperString = "";
 
-        if(!toUpper.isEmpty()){
+        if (!toUpper.isEmpty()) {
             upperString = toUpper.substring(0, 1).toUpperCase() + toUpper.substring(1).toLowerCase();
         }
         return upperString;
@@ -203,43 +229,43 @@ public class ArtistDetailsActivity extends AppCompatActivity {
 
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot requestSnapshot: dataSnapshot.getChildren()) {
+                for (DataSnapshot requestSnapshot : dataSnapshot.getChildren()) {
                     DataSnapshot productsSnapshot = requestSnapshot.child("social");
-                    for (DataSnapshot ds: productsSnapshot.getChildren()) {
+                    for (DataSnapshot ds : productsSnapshot.getChildren()) {
 
                         SocialModel socialMedia = ds.getValue(SocialModel.class);
 
-                            if(socialMedia.getUrl() !=null && socialMedia.getUrl().contains("facebook")){
-                                facebookUrl = socialMedia.getUrl().toString();
-                                imageViewFacebook.setEnabled(true);
+                        if (socialMedia.getUrl() != null && socialMedia.getUrl().contains("facebook")) {
+                            facebookUrl = socialMedia.getUrl().toString();
+                            imageViewFacebook.setEnabled(true);
 
-                            }else if (socialMedia.getUrl() !=null && socialMedia.getUrl().contains("twitter")){
-                                twitterUrl = socialMedia.getUrl().toString();
-                                imageViewTwitter.setEnabled(true);
+                        } else if (socialMedia.getUrl() != null && socialMedia.getUrl().contains("twitter")) {
+                            twitterUrl = socialMedia.getUrl().toString();
+                            imageViewTwitter.setEnabled(true);
 
-                            }else if (socialMedia.getUrl() !=null && socialMedia.getUrl().contains("youtube")){
-                                youTubeUrl = socialMedia.getUrl().toString();
-                                imageViewYouTube.setEnabled(true);
+                        } else if (socialMedia.getUrl() != null && socialMedia.getUrl().contains("youtube")) {
+                            youTubeUrl = socialMedia.getUrl().toString();
+                            imageViewYouTube.setEnabled(true);
 
-                            }else if (socialMedia.getUrl() !=null && socialMedia.getUrl().contains("instagram")){
-                                instagramUrl = socialMedia.getUrl().toString();
-                                imageViewInstagram.setEnabled(true);
-                            }
+                        } else if (socialMedia.getUrl() != null && socialMedia.getUrl().contains("instagram")) {
+                            instagramUrl = socialMedia.getUrl().toString();
+                            imageViewInstagram.setEnabled(true);
+                        }
                     }
                 }
 
 
                 if (checkIsTablet()) {
-                    GridLayoutManager gridLayoutManager = new GridLayoutManager(ArtistDetailsActivity.this,4);
+                    GridLayoutManager gridLayoutManager = new GridLayoutManager(ArtistDetailsActivity.this, 4);
                     gridLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
                     albumsRecyclerView.setLayoutManager(gridLayoutManager);
-                    albumAdapter = new AlbumAdapter(ArtistDetailsActivity.this,albumDetailsArrayList);
+                    albumAdapter = new AlbumAdapter(ArtistDetailsActivity.this, albumDetailsArrayList, mAuth.getCurrentUser().getUid());
                     albumsRecyclerView.setAdapter(albumAdapter);
                 } else {
-                    GridLayoutManager gridLayoutManager = new GridLayoutManager(ArtistDetailsActivity.this,2);
+                    GridLayoutManager gridLayoutManager = new GridLayoutManager(ArtistDetailsActivity.this, 2);
                     gridLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
                     albumsRecyclerView.setLayoutManager(gridLayoutManager);
-                    albumAdapter = new AlbumAdapter(ArtistDetailsActivity.this,albumDetailsArrayList);
+                    albumAdapter = new AlbumAdapter(ArtistDetailsActivity.this, albumDetailsArrayList, mAuth.getCurrentUser().getUid());
                     albumsRecyclerView.setAdapter(albumAdapter);
                 }
 

@@ -46,9 +46,14 @@
                 android:layout_height="wrap_content">
                 <EditText
                     android:id="@+id/etAds"
-                    android:hint="Message"
                     android:fontFamily="sans-serif-light"
-
+                    android:gravity="top"
+                    android:hint="Type message (required)"
+                    android:inputType="textMultiLine"
+                    android:lines="8"
+                    android:maxLines="3"
+                    android:minLines="6"
+                    android:scrollbars="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
             </com.google.android.material.textfield.TextInputLayout>

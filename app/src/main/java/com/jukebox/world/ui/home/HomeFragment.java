@@ -6,6 +6,7 @@ import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.GridLayout;
 import android.widget.Toast;
 
 
@@ -27,8 +28,11 @@ import com.jukebox.world.R;
 import com.jukebox.world.ViewModel.AlbumDetails;
 import com.jukebox.world.ViewModel.Artist;
 
+import com.jukebox.world.ViewModel.MyPlayListTrack;
 import com.jukebox.world.adapters.AlbumAdapter;
 import com.jukebox.world.adapters.ArtistAdapter;
+import com.jukebox.world.adapters.MyLibaryAdapter;
+import com.jukebox.world.ui.playList.MyPlayListSongsActivity;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -38,12 +42,12 @@ public class HomeFragment extends Fragment implements MusicCategoryRecyclerViewA
     private MusicCategoryRecyclerViewAdapter adapter;
     private Hashtable items = new Hashtable();
 
-    private GridLayoutManager layoutManager,artistlayoutManager;
-    private RecyclerView albumsRecyclerView,artistRecyclerView;
+    private GridLayoutManager layoutManager, artistlayoutManager;
+    private RecyclerView albumsRecyclerView, artistRecyclerView;
     private ArrayList<AlbumDetails> albumDetailsArrayList = new ArrayList<>();
     private ArrayList<Artist> artistArrayList = new ArrayList<>();
     private ArtistAdapter artistAdapter;
-    private AlbumAdapter albumAdapter;
+    AlbumAdapter albumAdapter;
 
     private FirebaseAuth mAuth;
     private DatabaseReference mAlbumsDatabase;
@@ -59,32 +63,68 @@ public class HomeFragment extends Fragment implements MusicCategoryRecyclerViewA
         albumsRecyclerView = root.findViewById(R.id.home_albums_recyclerView);
         artistRecyclerView = root.findViewById(R.id.home_artists_recyclerView);
 
-        layoutManager = new GridLayoutManager(getActivity(), 2);
-        albumAdapter = new AlbumAdapter(getActivity(),albumDetailsArrayList);
-        albumsRecyclerView.setAdapter(albumAdapter);
-
-
-        artistlayoutManager = new GridLayoutManager(getActivity(), 2);
-        artistAdapter = new ArtistAdapter(getActivity(),artistArrayList);
-        artistRecyclerView.setAdapter(artistAdapter);
-
-
-       // albumsRecyclerView.setHasFixedSize(true);
-       // artistRecyclerView.setHasFixedSize(true);
-
-        if (checkIsTablet()) {
-            albumsRecyclerView.setLayoutManager(layoutManager);
-            artistRecyclerView.setLayoutManager(artistlayoutManager);
-        } else {
-            albumsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-            artistRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        }
-
-
-        getAllAlbums();
-        getAllArtist();
+        // getAllAlbums();
+        //getAllArtist();
 
         return root;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        albumDetailsArrayList.clear();
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Users").child("Customers");
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+
+            private AlbumDetails albumDetails;
+
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot requestSnapshot : dataSnapshot.getChildren()) {
+                    DataSnapshot productsSnapshot = requestSnapshot.child("albums");
+                    for (DataSnapshot ds : productsSnapshot.getChildren()) {
+
+                        if (ds.hasChild("albumCoverUrl") && ds.hasChild("albumGenre") && ds.hasChild("albumRealiseDate") && ds.hasChild("albumTitle") && ds.hasChild("isPublished")) {
+
+                            if (Boolean.parseBoolean(ds.child("isPublished").getValue().toString())) {
+                                albumDetails = new AlbumDetails();
+                                albumDetails.setGenre(ds.child("albumGenre").getValue().toString());
+                                albumDetails.setTitle(ds.child("albumTitle").getValue().toString());
+                                albumDetails.setCoverImageUrl(ds.child("albumCoverUrl").getValue().toString());
+                                albumDetails.setRealiseDate("" + ds.child("albumRealiseDate").getValue());
+                                albumDetails.setPrice(ds.child("albumPrice").getValue().toString());
+                                albumDetails.setArtist(ds.child("albumArtist").getValue().toString());
+                                albumDetails.setPublished(Boolean.parseBoolean(ds.child("isPublished").getValue().toString()));
+                                albumDetailsArrayList.add(albumDetails);
+                            }
+                        }
+                    }
+
+                    if (checkIsTablet()) {
+
+                        GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), 4, LinearLayoutManager.HORIZONTAL, false);
+                        albumsRecyclerView.setLayoutManager(gridLayoutManager);
+                        AlbumAdapter albumAdapter = new AlbumAdapter(getActivity(), albumDetailsArrayList, userID);
+                        albumsRecyclerView.setAdapter(albumAdapter);
+
+                    } else {
+                        GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), 3, LinearLayoutManager.VERTICAL, false);
+                        albumsRecyclerView.setLayoutManager(gridLayoutManager); // set LayoutManager to RecyclerView
+                        AlbumAdapter albumAdapter = new AlbumAdapter(getActivity(), albumDetailsArrayList, userID);
+                        albumsRecyclerView.setAdapter(albumAdapter); // set the Adapter to RecyclerView
+                    }
+
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                throw databaseError.toException(); // don't ignore errors
+            }
+        });
+
+        getAllArtist();
+
     }
 
     @Override
@@ -97,21 +137,21 @@ public class HomeFragment extends Fragment implements MusicCategoryRecyclerViewA
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Users").child("Customers");
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
 
-            AlbumDetails albumDetails;
+            private AlbumDetails albumDetails;
 
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot requestSnapshot: dataSnapshot.getChildren()) {
+                for (DataSnapshot requestSnapshot : dataSnapshot.getChildren()) {
                     DataSnapshot productsSnapshot = requestSnapshot.child("albums");
-                    for (DataSnapshot ds: productsSnapshot.getChildren()) {
+                    for (DataSnapshot ds : productsSnapshot.getChildren()) {
 
                         if (ds.hasChild("albumCoverUrl") && ds.hasChild("albumGenre") && ds.hasChild("albumRealiseDate") && ds.hasChild("albumTitle")) {
 
-                            albumDetails  = new AlbumDetails();
+                            albumDetails = new AlbumDetails();
                             albumDetails.setGenre(ds.child("albumGenre").getValue().toString());
                             albumDetails.setTitle(ds.child("albumTitle").getValue().toString());
                             albumDetails.setCoverImageUrl(ds.child("albumCoverUrl").getValue().toString());
-                            albumDetails.setRealiseDate(""+ds.child("albumRealiseDate").getValue());
+                            albumDetails.setRealiseDate("" + ds.child("albumRealiseDate").getValue());
                             albumDetails.setPrice(ds.child("albumPrice").getValue().toString());
                             albumDetails.setArtist(ds.child("albumArtist").getValue().toString());
                             albumDetailsArrayList.add(albumDetails);
@@ -119,20 +159,17 @@ public class HomeFragment extends Fragment implements MusicCategoryRecyclerViewA
                     }
                 }
 
-                /*LinearLayoutManager horizontalLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
-                albumsRecyclerView.setLayoutManager(horizontalLayoutManager);
-                albumAdapter = new AlbumAdapter(getActivity(),albumDetailsArrayList);
-                albumsRecyclerView.setAdapter(albumAdapter);*/
-
-
                 if (checkIsTablet()) {
-                    GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(),4);
+                    GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), 4);
                     gridLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
                     albumsRecyclerView.setLayoutManager(gridLayoutManager);
                 } else {
-                    GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(),2);
+
+                    GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), 2);
                     gridLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+                    albumsRecyclerView.setHasFixedSize(true);
                     albumsRecyclerView.setLayoutManager(gridLayoutManager);
+
                 }
 
             }
@@ -146,6 +183,8 @@ public class HomeFragment extends Fragment implements MusicCategoryRecyclerViewA
 
     private void getAllArtist() {
 
+        artistArrayList.clear();
+
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Users").child("Customers");
         Query albumsQuery = ref.orderByChild("role").equalTo("Artist");
         albumsQuery.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -157,43 +196,22 @@ public class HomeFragment extends Fragment implements MusicCategoryRecyclerViewA
 
                 for (DataSnapshot ds : dataSnapshot.getChildren()) {
 
-                   /* artist  = new Artist();
+                    artist = new Artist();
                     artist.setKey(ds.getKey());
-                    artist.setEmail(ds.child("email").getValue().toString());
-                    artist.setFirstName(ds.child("firstName").getValue().toString());
-                    artist.setLastName(ds.child("lastName").getValue().toString());
-                    artist.setPhone(ds.child("phone").getValue().toString());
+                    artist.setEmail("" + ds.child("email").getValue());
+                    artist.setFirstName("" + ds.child("firstName").getValue());
+                    artist.setLastName("" + ds.child("lastName").getValue());
+                    artist.setPhone("" + ds.child("phone").getValue());
 
-                    if(ds.child("stageName").getValue().toString()!=null){
-                        artist.setStageName(ds.child("stageName").getValue().toString());
-                    }else {
+                    if ("" + ds.child("stageName").getValue() != null) {
+                        artist.setStageName("" + ds.child("stageName").getValue());
+                    } else {
                         artist.setStageName("unspecified");
                     }
 
 
-                    if(ds.child("profileImageUrl").getValue().toString()!=null){
-                        artist.setProfileImageUrl(ds.child("profileImageUrl").getValue().toString());
-                    }
-
-                    artistArrayList.add(artist);*/
-
-
-                    artist  = new Artist();
-                    artist.setKey(ds.getKey());
-                    artist.setEmail(""+ds.child("email").getValue());
-                    artist.setFirstName(""+ds.child("firstName").getValue());
-                    artist.setLastName(""+ds.child("lastName").getValue());
-                    artist.setPhone(""+ds.child("phone").getValue());
-
-                    if(""+ds.child("stageName").getValue()!=null){
-                        artist.setStageName(""+ds.child("stageName").getValue());
-                    }else {
-                        artist.setStageName("unspecified");
-                    }
-
-
-                    if(""+ds.child("profileImageUrl").getValue()!=null){
-                        artist.setProfileImageUrl(""+ds.child("profileImageUrl").getValue());
+                    if ("" + ds.child("profileImageUrl").getValue() != null) {
+                        artist.setProfileImageUrl("" + ds.child("profileImageUrl").getValue());
                     }
 
                     artistArrayList.add(artist);
@@ -202,7 +220,7 @@ public class HomeFragment extends Fragment implements MusicCategoryRecyclerViewA
 
                 LinearLayoutManager horizontalLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
                 artistRecyclerView.setLayoutManager(horizontalLayoutManager);
-                artistAdapter = new ArtistAdapter(getActivity(),artistArrayList);
+                artistAdapter = new ArtistAdapter(getActivity(), artistArrayList);
                 artistRecyclerView.setAdapter(artistAdapter);
 
             }

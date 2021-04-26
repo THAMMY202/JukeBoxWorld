@@ -29,5 +29,23 @@
         android:label="@string/menu_bank_details"
         tools:layout="@layout/fragment_banking_details" />
 
+    <fragment
+        android:id="@+id/nav_my_play_list"
+        android:name="com.jukebox.world.ui.playList.MyPlayListsFragment"
+        android:label="@string/menu_play_list"
+        tools:layout="@layout/fragment_my_play_lists" />
+
+    <fragment
+        android:id="@+id/nav_my_play_list_song"
+        android:name="com.jukebox.world.ui.playList.MyPlayListSongsFragment"
+        android:label="@string/menu_play_list"
+        tools:layout="@layout/fragment_my_play_list_songs" />
+
+    <fragment
+        android:id="@+id/nav_library"
+        android:name="com.jukebox.world.ui.library.MyLibaryFragment"
+        android:label="@string/menu_play_list"
+        tools:layout="@layout/fragment_my_libary" />
+
 
 </navigation>

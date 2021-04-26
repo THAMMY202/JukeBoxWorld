@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:interpolator="@android:anim/accelerate_interpolator"
+    android:ordering="sequentially"
+    android:shareInterpolator="false">
+    <!-- Step 1 -->
+    <objectAnimator
+        android:duration="400"
+        android:propertyName="pathData"
+        android:valueFrom="M8,11.4 l0,0"
+        android:valueTo="M8,11.4 l9,9.8"
+        android:valueType="pathType" />
+</set>

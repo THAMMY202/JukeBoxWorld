@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/flHolder"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.playList.MyPlayListSongsActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:background="#000"
+            android:visibility="visible"
+            android:id="@+id/SongLinearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:background="@drawable/mnotes"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <RelativeLayout
+                    android:id="@+id/rlPlayingMedia"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#820000"
+                    android:visibility="gone">
+
+                    <!--Creating a ImageView-->
+                    <ImageView
+                        android:id="@+id/imgOutputSongCover"
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:layout_margin="10dp"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_launcher_background" />
+
+                    <TextView
+                        android:visibility="gone"
+                        android:id="@+id/textViewAudioStatus"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="15dp"
+                        android:layout_toRightOf="@+id/imgOutputSongCover"
+                        android:padding="5dp"
+                        android:text=""
+                        android:textColor="#808080"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+
+                    <!--Creating a TextView-->
+                    <TextView
+                        android:id="@+id/tvOutputSongTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="15dp"
+                        android:layout_toRightOf="@+id/imgOutputSongCover"
+                        android:padding="5dp"
+                        android:text=""
+                        android:textColor="#808080"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:id="@+id/l"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/tvOutputSongTitle"
+                        android:layout_toRightOf="@+id/imgOutputSongCover"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/tvOutputArtistName"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text=""
+                            android:textColor="#808080"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/tvOutputSongDuration"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="5dp"
+                            android:text=""
+                            android:textColor="#808080"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/tvOutputSongTitle"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginRight="10dp"
+                        android:layout_toRightOf="@+id/l"
+                        android:gravity="end"
+                        android:orientation="horizontal">
+
+
+                        <ImageView
+                            android:id="@+id/imgOutputPlay"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@android:drawable/ic_media_play" />
+
+                        <ImageView
+                            android:id="@+id/imgOutputNext"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@android:drawable/ic_media_next" />
+
+                    </LinearLayout>
+
+                </RelativeLayout>
+
+                <ListView
+                    android:background="@drawable/mnotes"
+                    android:id="@+id/lstMyMusic"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:choiceMode="singleChoice" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:background="@drawable/mnotes"
+            android:id="@+id/rlPlayingMediaFullPage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/imgMoreDetailsSongCover"
+                android:layout_width="match_parent"
+                android:layout_height="450dp"
+                android:layout_alignParentTop="true"
+                android:src="@drawable/adele"/>
+
+
+            <com.gauravk.audiovisualizer.visualizer.BarVisualizer
+                xmlns:custom="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/BarVisualizerFullPage"
+                android:layout_below="@+id/imgMoreDetailsSongCover"
+                android:layout_centerInParent="true"
+                android:layout_marginRight="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="16dp"
+                android:layout_width="300dp"
+                android:layout_height="50dp"
+                custom:avDensity="0.5"
+                custom:avType="outline"
+                custom:avColor="@color/av_dark_blue"
+                custom:avSpeed="normal"/>
+
+            <TextView
+                android:id="@+id/imgMoreDetailsSongTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/BarVisualizerFullPage"
+                android:layout_centerInParent="true"
+                android:layout_marginTop="15dp"
+                android:text=""
+                android:textColor="@android:color/black"
+                android:textSize="20sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/imgMoreDetailsSongArtist"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/imgMoreDetailsSongTitle"
+                android:layout_centerInParent="true"
+                android:layout_marginTop="15dp"
+                android:text=""
+                android:textColor="@android:color/black"
+                android:textSize="17sp" />
+
+            <LinearLayout
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/imgMoreDetailsSongArtist"
+                android:layout_centerInParent="true"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginRight="15dp"
+                android:orientation="vertical">
+
+                <SeekBar
+                    android:id="@+id/song_seekbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:textColor="@android:color/black"
+                        android:id="@+id/txtStartTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:text="" />
+
+                    <TextView
+                        android:textColor="@android:color/black"
+                        android:id="@+id/txtSongTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:text="" />
+
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/imgMoreDetailsSongPrevious"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="20dp"
+                        android:src="@android:drawable/ic_media_previous" />
+
+                    <ImageView
+                        android:id="@+id/imgMoreDetailsSongPlay"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="20dp"
+                        android:src="@android:drawable/ic_media_play" />
+
+                    <ImageView
+                        android:id="@+id/imgMoreDetailsSongNext"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@android:drawable/ic_media_next" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <TextView
+        android:visibility="gone"
+        android:id="@+id/tvNosongs"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="No songs" />
+
+</FrameLayout>

@@ -5,12 +5,8 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,6 +15,7 @@ import com.bumptech.glide.Glide;
 import com.jukebox.world.AlbumTracksActivity;
 import com.jukebox.world.R;
 import com.jukebox.world.ViewModel.AlbumDetails;
+import com.jukebox.world.ui.newrelease.UploadTracksToAlbumActivity;
 
 import java.util.ArrayList;
 
@@ -26,11 +23,12 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
 
     private Context context;
     public ArrayList<AlbumDetails> albumDetails;
+    private String currentUserId;
 
-
-    public AlbumAdapter(Context context, ArrayList<AlbumDetails> albumDetails) {
+    public AlbumAdapter(Context context, ArrayList<AlbumDetails> albumDetails,String currentUserId) {
         this.albumDetails = albumDetails;
         this.context = context;
+        this.currentUserId = currentUserId;
     }
 
     @NonNull
@@ -58,6 +56,21 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
                 intent.putExtra("albumCover",album.getCoverImageUrl());
                 intent.putExtra("albumArtist",album.getArtist());
                 context.startActivity(intent);
+            }
+        });
+
+        holder.imageViewCover.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if(currentUserId.equalsIgnoreCase(album.getArtist())){
+                    Intent intent = new Intent(context, UploadTracksToAlbumActivity.class);
+                    intent.putExtra("albumTitle",album.getTitle());
+                    intent.putExtra("albumPrice",album.getPrice());
+                    intent.putExtra("albumCover",album.getCoverImageUrl());
+                    intent.putExtra("albumArtist",album.getArtist());
+                    context.startActivity(intent);
+                }
+                return false;
             }
         });
     }

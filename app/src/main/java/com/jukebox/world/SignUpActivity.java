@@ -151,6 +151,7 @@ public class SignUpActivity extends AppCompatActivity {
                             userInfo.put("phone", phone);
                             userInfo.put("firstName", name);
                             userInfo.put("role", userRole);
+                            userInfo.put("wallet", "00.00");
                             if (userRole.equals("Artist")) {
                                 userInfo.put("stageName", stagName);
                             }

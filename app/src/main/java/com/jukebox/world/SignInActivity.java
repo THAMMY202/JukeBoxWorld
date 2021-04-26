@@ -22,8 +22,8 @@ import com.google.firebase.database.FirebaseDatabase;
 
 public class SignInActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private Button buttonSignIn, btnReset;
-    private TextView textViewNewAccount;
+    private Button buttonSignIn;
+    private TextView textViewNewAccount,btnReset;
 
     private EditText inputEmail, inputPassword;
     private FirebaseAuth auth;
@@ -38,24 +38,18 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         setContentView(R.layout.activity_sign_in);
 
         initView();
-
-       /* btnReset.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(SignInActivity.this, ResetPasswordActivity.class));
-            }
-        });*/
     }
 
     private void initView() {
 
-        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+        //FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         auth = FirebaseAuth.getInstance();
 
         firebaseAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 user = FirebaseAuth.getInstance().getCurrentUser();
+
                 if (user != null) {
                     Intent intent = new Intent(SignInActivity.this, MainActivity.class);
                     startActivity(intent);
@@ -73,8 +67,15 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         textViewNewAccount.setOnClickListener(this);
 
         progressBar = findViewById(R.id.progressBar);
-        btnReset = findViewById(R.id.btn_reset_password);
+        btnReset = findViewById(R.id.forgotPassword);
 
+
+        btnReset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(SignInActivity.this, ResetPasswordActivity.class));
+            }
+        });
 
     }
 

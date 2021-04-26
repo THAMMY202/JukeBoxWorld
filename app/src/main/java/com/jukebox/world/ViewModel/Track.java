@@ -9,6 +9,16 @@ public class Track {
     private String type;
     private String feature;
 
+    public String getDuration() {
+        return duration;
+    }
+
+    public void setDuration(String duration) {
+        this.duration = duration;
+    }
+
+    private String duration;
+
     public String getCover() {
         return cover;
     }
