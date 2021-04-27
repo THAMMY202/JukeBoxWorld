@@ -11,22 +11,6 @@ public class MyPlayListTrack {
     private String trackDuration;
     private  boolean selected;
 
-    public MyPlayListTrack(){}
-
-    @Override
-    public String toString() {
-        return "MyPlayListTrack{" +
-                "artist='" + artist + '\'' +
-                ", album='" + album + '\'' +
-                ", title='" + title + '\'' +
-                ", url='" + url + '\'' +
-                ", cover='" + cover + '\'' +
-                ", type='" + type + '\'' +
-                ", feature='" + feature + '\'' +
-                ", trackDuration='" + trackDuration + '\'' +
-                '}';
-    }
-
     public String getArtist() {
         return artist;
     }
@@ -83,24 +67,12 @@ public class MyPlayListTrack {
         this.feature = feature;
     }
 
-    public String getDuration() {
+    public String getTrackDuration() {
         return trackDuration;
     }
 
-    public void setDuration(String duration) {
-        this.trackDuration = duration;
-    }
-
-    public MyPlayListTrack(String artist, String album, String title, String url, String cover, String type, String feature, boolean selected, String duration) {
-        this.artist = artist;
-        this.album = album;
-        this.title = title;
-        this.url = url;
-        this.cover = cover;
-        this.type = type;
-        this.feature = feature;
-        this.trackDuration = duration;
-        this.setSelected(selected);
+    public void setTrackDuration(String trackDuration) {
+        this.trackDuration = trackDuration;
     }
 
     public boolean isSelected() {
@@ -110,4 +82,34 @@ public class MyPlayListTrack {
     public void setSelected(boolean selected) {
         this.selected = selected;
     }
+
+    @Override
+    public String toString() {
+        return "MyPlayListTrack{" +
+                "artist='" + artist + '\'' +
+                ", album='" + album + '\'' +
+                ", title='" + title + '\'' +
+                ", url='" + url + '\'' +
+                ", cover='" + cover + '\'' +
+                ", type='" + type + '\'' +
+                ", feature='" + feature + '\'' +
+                ", trackDuration='" + trackDuration + '\'' +
+                ", selected=" + selected +
+                '}';
+    }
+
+    public MyPlayListTrack(String artist, String album, String title, String url, String cover, String type, String feature, String trackDuration, boolean selected) {
+        this.artist = artist;
+        this.album = album;
+        this.title = title;
+        this.url = url;
+        this.cover = cover;
+        this.type = type;
+        this.feature = feature;
+        this.trackDuration = trackDuration;
+        this.selected = selected;
+    }
+
+    public MyPlayListTrack(){}
+
 }

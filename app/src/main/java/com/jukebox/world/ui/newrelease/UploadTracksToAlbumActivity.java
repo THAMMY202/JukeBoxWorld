@@ -164,28 +164,32 @@ public class UploadTracksToAlbumActivity extends AppCompatActivity {
         progressDialog.setTitle("Uploading");
         progressDialog.show();
 
-        final StorageReference filePath = FirebaseStorage.getInstance().getReference().child("albums").child(userID).child(albumTitle).child(TrackName);
+        if (trackCoverUri != null) {
+            final StorageReference filePath = FirebaseStorage.getInstance().getReference().child("albums").child(userID).child(albumTitle).child(TrackName);
 
-        filePath.putFile(trackCoverUri).continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
-            @Override
-            public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
-                if (!task.isSuccessful()) {
-                    progressDialog.dismiss();
-                    throw task.getException();
+            filePath.putFile(trackCoverUri).continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                @Override
+                public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                    if (!task.isSuccessful()) {
+                        progressDialog.dismiss();
+                        throw task.getException();
+                    }
+                    return filePath.getDownloadUrl();
                 }
-                return filePath.getDownloadUrl();
-            }
-        }).addOnCompleteListener(new OnCompleteListener<Uri>() {
-            @Override
-            public void onComplete(@NonNull Task<Uri> task) {
-                if (task.isSuccessful()) {
-                    progressDialog.dismiss();
-                    Uri downUri = task.getResult();
-                    uploadTrack(trackUri, downUri.toString());
+            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                @Override
+                public void onComplete(@NonNull Task<Uri> task) {
+                    if (task.isSuccessful()) {
+                        progressDialog.dismiss();
+                        Uri downUri = task.getResult();
+                        uploadTrack(trackUri, downUri.toString());
 
+                    }
                 }
-            }
-        });
+            });
+        } else {
+            uploadTrack(trackUri, "");
+        }
 
     }
 

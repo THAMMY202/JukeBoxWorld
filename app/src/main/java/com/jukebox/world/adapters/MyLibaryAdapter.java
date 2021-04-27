@@ -53,7 +53,7 @@ public class MyLibaryAdapter extends ArrayAdapter<MyPlayListTrack> {
             viewHolder.txtSongTitle.setText(dataModel.getTitle() + "(feat. " + dataModel.getFeature() + ")");
         }
 
-        viewHolder.txtSongDuration.setText(String.format("." + dataModel.getDuration()));
+        viewHolder.txtSongDuration.setText(String.format("." + dataModel.getTrackDuration()));
         //viewHolder.txtSongDuration.setText( ". "+ getDuration(dataModel.getUrl()));
         Glide.with(mContext).load(dataModel.getCover()).into(viewHolder.imgSongCover);
         return convertView;

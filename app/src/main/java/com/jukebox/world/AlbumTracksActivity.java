@@ -286,7 +286,7 @@ public class AlbumTracksActivity extends AppCompatActivity {
                     myPlayListTrack.setTitle(snapshot.child("trackTitle").getValue().toString());
                     myPlayListTrack.setUrl(snapshot.child("trackUrl").getValue().toString());
                     myPlayListTrack.setCover(snapshot.child("trackCover").getValue().toString());
-                    myPlayListTrack.setDuration(snapshot.child("trackDuration").getValue().toString());
+                    myPlayListTrack.setTrackDuration(snapshot.child("trackDuration").getValue().toString());
                     myPlayListTracks.add(myPlayListTrack);
 
                 }

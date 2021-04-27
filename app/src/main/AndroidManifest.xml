@@ -20,8 +20,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
-        <activity android:name=".ui.newrelease.UploadTracksToAlbumActivity"/>
+        <activity android:name=".AdminRegistrationActivity"></activity>
+        <activity android:name=".ui.newrelease.UploadTracksToAlbumActivity" />
         <activity android:name=".ui.library.MyLibaryToAddFromActivity" />
         <activity android:name=".ui.playList.MyPlayListSongsActivity" />
         <activity android:name=".ui.ArtistDetailsActivity" />
@@ -29,7 +29,6 @@
         <activity
             android:name=".AlbumTracksActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-
         <activity android:name=".AdsActivity" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
@@ -43,18 +42,18 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <activity android:name=".ResetPasswordActivity" />
+        <activity
+            android:name=".ResetPasswordActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".SignUpActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-
         <activity
             android:name=".SignInActivity"
-            android:theme="@style/AppTheme.NoActionBar"/>
-
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ui.SplashActivity"
             android:label="@string/app_name"

@@ -43,6 +43,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
+                    android:fontFamily="@font/aclonica"
                     android:text="@string/list_artists"
                     android:textSize="12sp"
                     android:textStyle="bold" />
@@ -110,6 +111,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
                     android:text="@string/list_albums"
+                    android:fontFamily="@font/aclonica"
                     android:textSize="12sp"
                     android:textStyle="bold" />
 
@@ -177,6 +179,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
                     android:text="@string/list_podcasts"
+                    android:fontFamily="@font/aclonica"
                     android:textSize="12sp"
                     android:textStyle="bold" />
 

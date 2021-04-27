@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/walpaper"
+    android:background="#000"
     tools:context=".SignInActivity">
 
 
@@ -35,11 +35,11 @@
 
     <EditText
         android:id="@+id/Email"
+        android:background="@drawable/edittextbackground"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:background="@drawable/et_style"
         android:ems="10"
         android:fontFamily="@font/aclonica"
         android:hint="Email"
@@ -56,12 +56,12 @@
 
     <EditText
         android:id="@+id/password"
+        android:background="@drawable/edittextbackground"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:background="@drawable/et_style"
         android:ems="10"
         android:fontFamily="@font/aclonica"
         android:hint="Password"
@@ -82,6 +82,7 @@
         android:layout_marginTop="32dp"
         android:layout_marginEnd="16dp"
         android:fontFamily="@font/aclonica"
+        android:background="#FFEB3B"
         android:text="Login"
         android:textSize="13sp"
         app:layout_constraintEnd_toEndOf="parent"

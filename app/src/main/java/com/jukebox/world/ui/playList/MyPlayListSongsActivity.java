@@ -3,11 +3,14 @@ package com.jukebox.world.ui.playList;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 
+import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;
@@ -40,6 +43,7 @@ import com.jukebox.world.ui.library.MyLibaryFragment;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 
@@ -74,7 +78,8 @@ public class MyPlayListSongsActivity extends AppCompatActivity {
     private static int oTime = 0, sTime = 0, eTime = 0, fTime = 5000, bTime = 5000;
     private Handler hdlr = new Handler();
     private ProgressDialog progressBar;
-    private BarVisualizer mVisualizer;
+    private BlastVisualizer mVisualizer;
+    List<String> permissions = new ArrayList<String>();
     private MenuItem menuItemAdd;
 
     @Override
@@ -86,6 +91,8 @@ public class MyPlayListSongsActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         setContentView(R.layout.activity_my_play_list_songs);
+
+        askPermission();
 
         initView();
         clickListeners();
@@ -99,6 +106,8 @@ public class MyPlayListSongsActivity extends AppCompatActivity {
         progressBar.show();
 
         mVisualizer = findViewById(R.id.BarVisualizerFullPage);
+
+
         textViewNoSongs = findViewById(R.id.tvNosongs);
         mAuth = FirebaseAuth.getInstance();
         userID = mAuth.getCurrentUser().getUid();
@@ -115,10 +124,10 @@ public class MyPlayListSongsActivity extends AppCompatActivity {
 
         imageViewSongCoverForFullPage = findViewById(R.id.imgMoreDetailsSongCover);
         imageViewPreviousSongForFullPage = findViewById(R.id.imgMoreDetailsSongPrevious);
+        linearLayoutSongs = findViewById(R.id.SongLinearLayout);
         imageViewCurrentPlaySongForFullPage = findViewById(R.id.imgMoreDetailsSongPlay);
         imageViewNextSongForFullPage = findViewById(R.id.imgMoreDetailsSongNext);
 
-        linearLayoutSongs = findViewById(R.id.SongLinearLayout);
         relativeLayoutSongMoreDetailsPage = findViewById(R.id.rlPlayingMediaFullPage);
         relativeLayoutPlayingMedia = findViewById(R.id.rlPlayingMedia);
         imageViewNext = findViewById(R.id.imgOutputNext);
@@ -145,7 +154,7 @@ public class MyPlayListSongsActivity extends AppCompatActivity {
                     textViewSongTitle.setText(myPlayListTrack.getTitle() + " (feat. " + myPlayListTrack.getFeature() + " )");
                 }
 
-                textViewSongDuration.setText(". " + myPlayListTrack.getDuration());
+                textViewSongDuration.setText(". " + myPlayListTrack.getTrackDuration());
                 // textViewSongDuration.setText(". " + getDuration(myPlayListTrack.getUrl()));
                 Glide.with(MyPlayListSongsActivity.this).load(myPlayListTrack.getCover()).into(imageViewSongCover);
 
@@ -180,6 +189,10 @@ public class MyPlayListSongsActivity extends AppCompatActivity {
                             mediaPlayer.start();
                             textViewAudioStatus.setText("Playing");
 
+                            /*int audioSessionId = mediaPlayer.getAudioSessionId();
+                            if (audioSessionId != -1)
+                                mVisualizer.setAudioSessionId(audioSessionId);*/
+
                             eTime = mediaPlayer.getDuration();
                             sTime = mediaPlayer.getCurrentPosition();
 
@@ -188,10 +201,6 @@ public class MyPlayListSongsActivity extends AppCompatActivity {
                                 oTime = 1;
                             }
 
-                            //get the AudioSessionId from your MediaPlayer and pass it to the visualizer
-                            int audioSessionId = mediaPlayer.getAudioSessionId();
-                            if (audioSessionId != -1)
-                                mVisualizer.setAudioSessionId(audioSessionId);
 
                             textViewSongCurrentTimeForFullPage.setText(String.format("%d min, %d sec", TimeUnit.MILLISECONDS.toMinutes(eTime),
                                     TimeUnit.MILLISECONDS.toSeconds(eTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(eTime))));
@@ -251,10 +260,6 @@ public class MyPlayListSongsActivity extends AppCompatActivity {
                             oTime = 1;
                         }
 
-                        //get the AudioSessionId from your MediaPlayer and pass it to the visualizer
-                        int audioSessionId = mediaPlayer.getAudioSessionId();
-                        if (audioSessionId != -1)
-                            mVisualizer.setAudioSessionId(audioSessionId);
 
                         textViewSongCurrentTimeForFullPage.setText(String.format("%d min, %d sec", TimeUnit.MILLISECONDS.toMinutes(eTime),
                                 TimeUnit.MILLISECONDS.toSeconds(eTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(eTime))));
@@ -315,11 +320,6 @@ public class MyPlayListSongsActivity extends AppCompatActivity {
                                 mediaPlayer.setDataSource(url);
                                 mediaPlayer.prepare();
                                 mediaPlayer.start();
-
-                                //get the AudioSessionId from your MediaPlayer and pass it to the visualizer
-                                int audioSessionId = mediaPlayer.getAudioSessionId();
-                                if (audioSessionId != -1)
-                                    mVisualizer.setAudioSessionId(audioSessionId);
 
                             } catch (Exception e) {
 
@@ -399,9 +399,6 @@ public class MyPlayListSongsActivity extends AppCompatActivity {
                                 mediaPlayer.prepare();
                                 mediaPlayer.start();
 
-                                int audioSessionId = mediaPlayer.getAudioSessionId();
-                                if (audioSessionId != -1)
-                                    mVisualizer.setAudioSessionId(audioSessionId);
 
                             } catch (Exception e) {
 
@@ -528,9 +525,6 @@ public class MyPlayListSongsActivity extends AppCompatActivity {
                             oTime = 1;
                         }
 
-                        int audioSessionId = mediaPlayer.getAudioSessionId();
-                        if (audioSessionId != -1)
-                            mVisualizer.setAudioSessionId(audioSessionId);
 
                         textViewSongCurrentTimeForFullPage.setText(String.format("%d min, %d sec", TimeUnit.MILLISECONDS.toMinutes(eTime),
                                 TimeUnit.MILLISECONDS.toSeconds(eTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(eTime))));
@@ -674,5 +668,45 @@ public class MyPlayListSongsActivity extends AppCompatActivity {
         } else {
             super.onBackPressed();
         }
+    }
+
+    private boolean askPermission() {
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+            int RECORD_AUDIO = checkSelfPermission(Manifest.permission.RECORD_AUDIO );
+
+            if (RECORD_AUDIO != PackageManager.PERMISSION_GRANTED) {
+                permissions.add(Manifest.permission.RECORD_AUDIO);
+            }
+
+
+            if (!permissions.isEmpty()) {
+                requestPermissions(permissions.toArray(new String[permissions.size()]), 1);
+            } else
+                return false;
+        } else
+            return false;
+        return true;
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == 1) {
+
+            boolean result = true;
+            for (int i = 0; i < permissions.length; i++) {
+                result = result && grantResults[i] == PackageManager.PERMISSION_GRANTED;
+            }
+            if (!result) {
+
+                Toast.makeText(this, "..", Toast.LENGTH_LONG).show();
+                 askPermission();
+            } else {
+            }
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 }

@@ -71,6 +71,9 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     private SliderLayout mDemoSlider;
 
     private String userName, userEmail;
+    private String saveWalletMoney;
+
+    private MenuItem menuItemAds, menuItemAdmin;
 
 
     @Override
@@ -127,17 +130,18 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         databaseReference = FirebaseDatabase.getInstance().getReference();
         slideLists = new ArrayList<>();
         getAllAds();
+
     }
 
     void alertDialogWallet() {
         LayoutInflater li = LayoutInflater.from(MainActivity.this);
         View promptsView = li.inflate(R.layout.custom_wallet_dialog, null);
 
-        //import androidx.appcompat.app.AlertDialog;
+
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
         alertDialogBuilder.setView(promptsView);
 
-        final EditText userInput = (EditText) promptsView.findViewById(R.id.etAmount);
+        final EditText userInput = promptsView.findViewById(R.id.etAmount);
 
         alertDialogBuilder
                 .setTitle("UPDATE MY WALLET")
@@ -145,6 +149,8 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         if (userInput.getText() != null && !userInput.getText().toString().isEmpty()) {
+
+                            saveWalletMoney = userInput.getText().toString();
 
                             new RaveUiManager(MainActivity.this)
                                     .setAmount(Double.parseDouble(userInput.getText().toString()))
@@ -156,7 +162,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                                     .setNarration("narration")
                                     .setPublicKey("FLWPUBK-bb073bc9a16aa65411460250c7aca087-X")
                                     .setEncryptionKey("4918493db6585bf187938914")
-                                    .setTxRef("txRef")
+                                    .setTxRef(userID)
                                     .acceptCardPayments(true)
                                     .acceptSaBankPayments(true)
                                     .onStagingEnv(false)
@@ -172,10 +178,8 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                             }
                         });
 
-        // create alert dialog
         AlertDialog alertDialog = alertDialogBuilder.create();
 
-        // show it
         alertDialog.show();
     }
 
@@ -187,6 +191,10 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists() && dataSnapshot.getChildrenCount() > 0) {
                     Map<String, Object> map = (Map<String, Object>) dataSnapshot.getValue();
+
+                    if (map.get("role") != null && !map.get("role").toString().equalsIgnoreCase("Admin")) {
+                        hideAdminItems();
+                    }
 
                     if (map.get("email") != null) {
                         userEmail = map.get("email").toString().trim();
@@ -204,8 +212,10 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                     if (map.get("wallet") != null) {
 
                         DecimalFormat df = new DecimalFormat("0.00##");
+
                         String result = df.format(Double.parseDouble(map.get("wallet").toString().trim()));
                         mprofileBalance.setText("Wallet Balance: R " + result);
+
                     }
 
                     if (map.get("profileImageUrl") != null) {
@@ -220,10 +230,19 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         });
     }
 
+
+    private void hideAdminItems() {
+        menuItemAdmin.setVisible(false);
+        menuItemAds.setVisible(false);
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
+        //Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
+
+        menuItemAds = menu.findItem(R.id.action_ads);
+        menuItemAdmin = menu.findItem(R.id.action_add_admin);
 
         MenuItem menuItem = menu.findItem(R.id.action_search);
         SearchView searchView = (SearchView) menuItem.getActionView();
@@ -231,12 +250,16 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         return true;
     }
 
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
         switch (item.getItemId()) {
             case R.id.action_ads:
                 startActivity(new Intent(MainActivity.this, AdsActivity.class));
+                return true;
+
+            case R.id.action_add_admin:
+                startActivity(new Intent(MainActivity.this, AdminRegistrationActivity.class));
                 return true;
 
             case R.id.action_logout:
@@ -357,12 +380,12 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             String message = data.getStringExtra("response");
             if (resultCode == RavePayActivity.RESULT_SUCCESS) {
                 final DatabaseReference updateWalletBalanceDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child("Customers").child(userID).child("wallet");
-                updateWalletBalanceDatabase.setValue("");
-                Toast.makeText(this, "SUCCESS " + message, Toast.LENGTH_SHORT).show();
+                updateWalletBalanceDatabase.setValue(saveWalletMoney);
+                Toast.makeText(this, "Payment was successfully ", Toast.LENGTH_SHORT).show();
             } else if (resultCode == RavePayActivity.RESULT_ERROR) {
-                Toast.makeText(this, "ERROR " + message, Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Payment error", Toast.LENGTH_SHORT).show();
             } else if (resultCode == RavePayActivity.RESULT_CANCELLED) {
-                Toast.makeText(this, "CANCELLED " + message, Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Payment was cancelled", Toast.LENGTH_SHORT).show();
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);

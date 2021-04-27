@@ -1,6 +1,5 @@
 package com.jukebox.world.ui.library;
 
-import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
@@ -11,7 +10,6 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.os.Handler;
-import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,7 +39,6 @@ import com.google.firebase.database.ValueEventListener;
 import com.jukebox.world.R;
 import com.jukebox.world.ViewModel.MyPlayListTrack;
 import com.jukebox.world.adapters.MyLibaryAdapter;
-import com.jukebox.world.ui.playList.MyPlayListSongsActivity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -87,7 +84,7 @@ public class MyLibaryFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_my_libary, container, false);
 
         dataModels = new ArrayList<>();
-        listView = (ListView) view.findViewById(R.id.lstMyMusic);
+        listView = view.findViewById(R.id.lstMyMusic);
 
         findViewById(view);
         clickListeners();

@@ -149,7 +149,7 @@
                 android:src="@drawable/adele"/>
 
 
-            <com.gauravk.audiovisualizer.visualizer.BarVisualizer
+            <com.gauravk.audiovisualizer.visualizer.BlastVisualizer
                 xmlns:custom="http://schemas.android.com/apk/res-auto"
                 android:id="@+id/BarVisualizerFullPage"
                 android:layout_below="@+id/imgMoreDetailsSongCover"
@@ -161,7 +161,7 @@
                 android:layout_width="300dp"
                 android:layout_height="50dp"
                 custom:avDensity="0.5"
-                custom:avType="outline"
+                custom:avType="fill"
                 custom:avColor="@color/av_dark_blue"
                 custom:avSpeed="normal"/>
 

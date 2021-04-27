@@ -14,6 +14,11 @@
         android:orderInCategory="100"
         android:title="Ads"
         app:showAsAction="never"/>
+    <item
+        android:id="@+id/action_add_admin"
+        android:orderInCategory="100"
+        android:title="Add Admin"
+        app:showAsAction="never"/>
 
     <item
         android:id="@+id/action_logout"
