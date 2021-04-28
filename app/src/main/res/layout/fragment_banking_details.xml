@@ -6,13 +6,25 @@
     android:layout_height="match_parent"
     tools:context=".ui.bankDetails.BankingDetailsFragment">
 
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_margin="16dp"
+        android:textColor="@color/white"
+        android:fontFamily="@font/aclonica"
+        android:text="Your banking information is secured with a payment gateway. All transaction are performed under the standard securityand all transaction performed are confidential. Your information will not be shared with the third party."
+        android:textSize="15sp"
+        android:layout_centerHorizontal="true"        />
+
 
     <androidx.cardview.widget.CardView
         android:layout_centerInParent="true"
         android:id="@+id/layoutName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_margin="16dp"
         app:cardCornerRadius="0dp"
         app:cardElevation="@dimen/cardview_default_elevation">
 
@@ -27,6 +39,7 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:fontFamily="@font/aclonica"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="4dp"
@@ -40,7 +53,7 @@
                     android:layout_marginLeft="-3dp"
                     android:layout_marginTop="5dp"
                     android:layout_marginBottom="20dp"
-                    android:fontFamily="sans-serif-light"
+                    android:fontFamily="@font/aclonica"
                     android:hint="Genre" />
             </LinearLayout>
 
@@ -50,9 +63,10 @@
 
                 <EditText
                     android:id="@+id/etAccountNumber"
+                    android:inputType="number"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-light"
+                    android:fontFamily="@font/aclonica"
                     android:hint="Account Number" />
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -63,9 +77,10 @@
 
                 <EditText
                     android:id="@+id/etAccountHolder"
+                    android:inputType="textPersonName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-light"
+                    android:fontFamily="@font/aclonica"
                     android:hint="Account Holder" />
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -78,7 +93,7 @@
                     android:id="@+id/etBranchCode"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-light"
+                    android:fontFamily="@font/aclonica"
                     android:hint="Branch Code" />
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -97,9 +112,8 @@
         android:layout_marginTop="30dp"
         android:layout_marginRight="16dp"
         android:layout_marginBottom="16dp"
-        android:background="@drawable/roundbutton"
-        android:text="SAVE"
-        android:textColor="@color/colorTransparentWhite"
-        app:fontFamily="@font/josefinslabbold" />
+        android:fontFamily="@font/aclonica"
+        android:background="#FFEB3B"
+        android:text="SAVE" />
 
 </RelativeLayout>
